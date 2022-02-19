@@ -3,12 +3,18 @@ import './App.css';
 import {Routes} from "react-router-dom";
 import {Route} from "react-router";
 import WordRow from "./components/WordRow";
+import WordleBoard from "./components/WordleBoard";
 
 function App() {
   return (
     <div className="App">
       <Routes>
-          <Route path={"/"} element={<WordRow letters={["H", "E", "L", "L", "O", "W", "O", "R", "L", "D"]}/>}> </Route>
+          <Route path={"/"} element={
+              <div>
+                  <WordleBoard length={5} height={5} />
+              </div>
+
+          }> </Route>
       </Routes>
     </div>
   );

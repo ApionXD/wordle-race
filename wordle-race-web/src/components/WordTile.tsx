@@ -1,8 +1,11 @@
-import React, {SVGProps, useRef} from "react";
+import React from "react";
 import {Layer, Rect, Stage, Text} from "react-konva"
 
-function WordTile(props: any) {
-    console.log(props.letter)
+type TileProps = {
+    //The current letter in the tile
+    letter?: string
+}
+export default function WordTile(props: TileProps) {
     return (
             <Stage width={48} height={48}>
                 <Layer>
@@ -14,4 +17,3 @@ function WordTile(props: any) {
             </Stage>
         )
 }
-export default WordTile
