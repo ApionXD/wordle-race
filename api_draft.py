@@ -1,12 +1,11 @@
 import collections
-from random_word import RandomWords
+from wonderwords import RandomWord
 
-r = RandomWords()
+r = RandomWord()
 wotd = 'toast'
-# w = r.get_random_word(hasDictionaryDef = 'True', includePartOfSpeech = 'noun,verb,adjective', minDictionaryCount = 10, minLength = 5, maxLength = 5)
 # print 5 test words:
 for i in range(5):
-    print(r.get_random_word(hasDictionaryDef = 'True', includePartOfSpeech = 'noun,verb,adjective', minDictionaryCount = 10, minLength = 5, maxLength = 5))
+    print(r.word(include_parts_of_speech = ['nouns', 'verbs', 'adjectives'], word_min_length = 5, word_max_length = 5))
 
 def validate(s):
     if s.isalpha():
