@@ -1,9 +1,18 @@
 import collections
 from wonderwords import RandomWord
+from flask import Flask, request
+import json
+
 
 # setup
+app = Flask(__name__)
 r = RandomWord()
 wotd = ''
+
+@app.route("/check", methods=['POST'] )
+def check_endpoint():
+    guess = request.json['guess']
+    return json.dumps(verifyGuess(guess))
 
 def generateWotd(pos = ['nouns', 'verbs', 'adjectives'], length = 5):
     # defaults to nouns/verbs/adjectives of length 5
