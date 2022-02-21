@@ -7,19 +7,23 @@ import json
 # setup
 app = Flask(__name__)
 r = RandomWord()
-wotd = ''
+wotd = 'toast'
+
 
 @app.route("/check", methods=['POST'] )
 def check_endpoint():
     guess = request.json['guess']
     return json.dumps(verifyGuess(guess))
 
+
 def generateWotd(pos = ['nouns', 'verbs', 'adjectives'], length = 5):
     # defaults to nouns/verbs/adjectives of length 5
     return r.word(include_parts_of_speech = pos, word_min_length = length, word_max_length = length)
 
+
 def validate(s):
     return s.isalpha()
+
 
 def verifyGuess(guess):
     if not validate(guess):
@@ -57,6 +61,7 @@ def verifyGuess(guess):
             returnArray[i] = tuple((guess[i], 0))
     return returnArray
 
+
 def main():
     global wotd
     wotd = 'toast'
@@ -64,5 +69,6 @@ def main():
     print(wotd)
     print(verifyGuess('shoot'))
 
+
 if __name__ == "__main__":
-    main()
+    app.run()
