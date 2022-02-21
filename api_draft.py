@@ -7,14 +7,16 @@ import json
 # setup
 app = Flask(__name__)
 r = RandomWord()
-wotd = 'toast'
-
+wotd = ''
 
 @app.route("/check", methods=['POST'] )
 def check_endpoint():
+    global wotd
+    if wotd == '':
+        wotd = generateWotd()
+        print(wotd)
     guess = request.json['guess']
     return json.dumps(verifyGuess(guess))
-
 
 def generateWotd(pos = ['nouns', 'verbs', 'adjectives'], length = 5):
     # defaults to nouns/verbs/adjectives of length 5
