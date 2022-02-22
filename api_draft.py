@@ -1,6 +1,7 @@
 import collections
+from pyrfc3339 import generate
 from wonderwords import RandomWord
-from flask import Flask, request
+from flask import Flask, request, redirect
 import json
 
 
@@ -17,6 +18,15 @@ def check_endpoint():
         print(wotd)
     guess = request.json['guess']
     return json.dumps(verifyGuess(guess))
+
+# TODO: add route for play again button that resets wotd
+@app.route("/newgame", methods=['POST'])
+def new_game():
+    global wotd
+    if request.json['check'] =='':
+        wotd = generateWotd()
+        print(wotd)
+    return json.dumps(True)
 
 def generateWotd(pos = ['nouns', 'verbs', 'adjectives'], length = 5):
     # defaults to nouns/verbs/adjectives of length 5
@@ -66,7 +76,6 @@ def verifyGuess(guess):
 
 def main():
     global wotd
-    wotd = 'toast'
     # wotd = generateWotd()
     print(wotd)
     print(verifyGuess('shoot'))
