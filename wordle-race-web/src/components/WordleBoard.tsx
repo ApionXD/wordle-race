@@ -1,6 +1,8 @@
 import React, {ReactElement, useEffect, useState} from 'react'
 import WordRow from "./WordRow";
 import axios from "axios";
+import { render } from '@testing-library/react';
+import { useNavigate } from "react-router-dom"
 
 type BoardProps = {
     length: number
@@ -37,6 +39,14 @@ export default function WordleBoard(props: BoardProps) {
                         newRow.push(r.data[i][1])
                     }
                     console.log(newRow)
+                    // check if game is won
+                    if (newRow.every((c, i, arr) => c == 2)) {
+                        setResponseText("You win!")
+                        render(
+                            <button onClick={()=> NewGame()}>New Game</button>
+                        )
+                        // TODO: lock the keyboard, offer play again button
+                    }
                     newRowColors[curRow] = newRow
                     setRowColors(newRowColors)
                 })
@@ -56,4 +66,13 @@ export default function WordleBoard(props: BoardProps) {
         <p>{responseText}</p>
         {rows}
     </div>
+}
+
+function NewGame() {
+    axios.post('/newgame', {
+        "check": ''
+    }).then(r => {
+        console.log(r.data)
+    })
+    window.location.reload()
 }
