@@ -1,26 +1,24 @@
 import collections
-from pyrfc3339 import generate
 from wonderwords import RandomWord
-from flask import Flask, request, redirect
+from flask import Blueprint
 import json
 
-
+api_blueprint = Blueprint('api_blueprint', __name__)
 # setup
-app = Flask(__name__)
 r = RandomWord()
 wotd = ''
 
-@app.route("/check", methods=['POST'] )
+@api_blueprint.route("/check", methods=['POST'])
 def check_endpoint():
     global wotd
     if wotd == '':
         wotd = generateWotd()
-        print(wotd)
+        print("New word: {wotd}")
     guess = request.json['guess']
     return json.dumps(verifyGuess(guess))
 
 # TODO: add route for play again button that resets wotd
-@app.route("/newgame", methods=['POST'])
+@api_blueprint.route("/newgame", methods=['POST'])
 def new_game():
     global wotd
     if request.json['check'] =='':
@@ -79,7 +77,3 @@ def main():
     # wotd = generateWotd()
     print(wotd)
     print(verifyGuess('shoot'))
-
-
-if __name__ == "__main__":
-    app.run()
