@@ -1,15 +1,10 @@
 import datetime
 import json
 
-from flask import Flask, request, Blueprint
-import pymongo
-from cachetools import TTLCache
+from flask import Flask, request, Blueprint, session
 from database import db
-from datetime import timedelta
-import uuid
 
 login_blueprint = Blueprint('login_blueprint', __name__)
-session_cache = TTLCache(maxsize=50, ttl=timedelta(hours=24), timer=datetime.datetime.now())
 user_collection = db["users"]
 
 @login_blueprint.route("/login", methods = ['POST'])
@@ -22,12 +17,13 @@ def login():
         return json.dumps({"response": "No such user"})
     if user["password_hash"] != user_details["hashed_pw"]:
         return json.dumps({"response": "Incorrect password"})
-    session_id = str(uuid.uuid4())
+    if "remember_me" in user_details:
+        session.permanent = True
+    session["signed_in"] = True
+    session["username"] = user_details["username"]
     response = {
-        "response": "Success",
-        "session_id": session_id
+        "response": "Success"
     }
-    session_cache[session_id] = user_details["username"]
     return json.dumps(response)
 
 
