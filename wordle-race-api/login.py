@@ -10,9 +10,11 @@ user_collection = db["users"]
 @login_blueprint.route("/login", methods = ['POST'])
 def login():
     user_details = request.json
+    # Queries db for matching user
     user = user_collection.find_one({
         "username": user_details["username"]
     })
+    # Errors
     if user is None:
         return json.dumps({"response": "No such user"})
     if user["password_hash"] != user_details["hashed_pw"]:
@@ -21,10 +23,7 @@ def login():
         session.permanent = True
     session["signed_in"] = True
     session["username"] = user_details["username"]
-    response = {
-        "response": "Success"
-    }
-    return json.dumps(response)
+    return json.dumps({"response": "Success"})
 
 
 @login_blueprint.route("/register", methods=['POST'])
@@ -37,7 +36,6 @@ def register():
     if "email" not in new_user:
         return json.dumps({"response": "No email"})
     if user_collection.find_one({"username": new_user["username"]}) is not None:
-        print({type(user_collection.find_one({"username": new_user["username"]}))})
         return json.dumps({"response": "Username exists"})
     if user_collection.find_one({"email": new_user["email"]}):
         return json.dumps({"response": "Email exists"})
