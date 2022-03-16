@@ -3,13 +3,18 @@ import json
 
 from flask import Flask, request, Blueprint, session
 from database import db
+from hashlib import sha256
 
 login_blueprint = Blueprint('login_blueprint', __name__)
 user_collection = db["users"]
+hasher = sha256()
 
 @login_blueprint.route("/login", methods = ['POST'])
 def login():
     user_details = request.json
+    password = user_details["password"]
+    hasher.update(password.encode(encoding='UTF-8', errors='strict'))
+    password_hash = hasher.hexdigest()
     # Queries db for matching user
     user = user_collection.find_one({
         "username": user_details["username"]
@@ -17,7 +22,7 @@ def login():
     # Errors
     if user is None:
         return json.dumps({"response": "No such user"})
-    if user["password_hash"] != user_details["password"]:
+    if user["password_hash"] != password_hash:
         return json.dumps({"response": "Incorrect password"})
     if "remember_me" in user_details:
         session.permanent = True
@@ -29,6 +34,9 @@ def login():
 @login_blueprint.route("/register", methods=['POST'])
 def register():
     new_user = request.json
+    password = new_user["password"]
+    hasher.update(password.encode(encoding='UTF-8', errors='strict'))
+    password_hash = hasher.hexdigest()
     if "username" not in new_user:
         return json.dumps({"response": "No username"})
     if "password" not in new_user:
@@ -41,7 +49,7 @@ def register():
         return json.dumps({"response": "Email exists"})
     user_obj = {
         "username": new_user["username"],
-        "password_hash": new_user["password"],
+        "password_hash": password_hash,
         "email": new_user["email"]
     }
     user_collection.insert_one(user_obj)
