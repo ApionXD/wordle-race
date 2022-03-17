@@ -23,9 +23,18 @@ class Game:
 # TODO: add route for play again button that resets wotd
 @game_blueprint.route("/newgame", methods=['POST'])
 def new_game():
+    print(current_games)
     game_request = request.json
-    game = Game("test1", "test2", 5)
-    current_games.append(game)
+    if len(current_games) == 0:
+        game = Game("test1", "test2", 5)
+        current_games.append(game)
+    else:
+        game = getGameByUser(game_request["user"])
+        game.gen_new_board()
+        game.player1_board = len(game.boards)-1
+        for g in current_games:
+            for b in g.boards:
+                print(b.word)
 
     return json.dumps({
         "response": "Success"
@@ -37,9 +46,12 @@ def check_endpoint():
     check_request = request.json
     game = getGameByUser(check_request["user"])
     guess = request.json['guess']
-    board = game.boards[game.player1_board] if game.player1 == check_request["user"] else game.boards[game.player2_board]
-    return json.dumps({
-        "response": board.verifyGuess(guess)
+    if guess == '':
+        pass
+    else:
+        board = game.boards[game.player1_board] if game.player1 == check_request["user"] else game.boards[game.player2_board]
+        return json.dumps({
+            "response": board.verifyGuess(guess)
     })
 
 def getGameByUser(user):

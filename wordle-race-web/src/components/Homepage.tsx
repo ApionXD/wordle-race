@@ -3,6 +3,7 @@ import Button from "./Button";
 import React from "react";
 import {GlobalState, useStateMachine} from "little-state-machine";
 import axios from "axios";
+import {NewGame} from "./WordleBoard";
 
 type HomepageProps = {
 
@@ -27,7 +28,7 @@ export default function Homepage(props: HomepageProps) {
                     :
                       <>
                       <label>Hello { state.username}<br/>
-                      <Link to={"board"}>Board</Link><br/>
+                      <Link to={"board"} onClick={NewGame}>Board</Link><br/>
                       </label><Button color='green' text='Logout' onClick={() => {
                       actions.logOut(undefined)
                       axios.get("/logout")

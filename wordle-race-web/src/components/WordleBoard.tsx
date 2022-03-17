@@ -3,20 +3,12 @@ import WordRow from "./WordRow";
 import axios from "axios";
 import { render } from '@testing-library/react';
 import { useNavigate } from "react-router-dom";
-import {GlobalState, useStateMachine} from "little-state-machine";
+import {GlobalState, StateMachineProvider, useStateMachine} from "little-state-machine";
 
 type BoardProps = {
     length: number
     height: number
 }
-
-// start a default game for testing
-axios.post('/newgame', {
-    "player1": "test1",
-    "player2": "test2"
-}).then(r => {
-    console.log(r.data)
-})
 
 export default function WordleBoard(props: BoardProps) {
     const { state } = useStateMachine();
@@ -80,11 +72,14 @@ export default function WordleBoard(props: BoardProps) {
     </div>
 }
 
-function NewGame() {
+export const NewGame = () => {
     axios.post('/newgame', {
-        "check": ''
+        "user": "test1"
     }).then(r => {
         console.log(r.data)
+        if (document.location.pathname = "/board") {
+            window.location.reload()
+        }
     })
-    window.location.reload()
+    
 }
