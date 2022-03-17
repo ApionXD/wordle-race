@@ -1,5 +1,4 @@
 import {Link} from "react-router-dom";
-import Button from "./Button";
 import React from "react";
 import {GlobalState, useStateMachine} from "little-state-machine";
 import axios from "axios";
@@ -28,10 +27,10 @@ export default function Homepage(props: HomepageProps) {
                       <>
                       <label>Hello { state.username}<br/>
                       <Link to={"board"}>Board</Link><br/>
-                      </label><Button color='green' text='Logout' onClick={() => {
+                      </label><button style={{backgroundColor: "green"}} onClick={() => {
                       actions.logOut(undefined)
                       axios.get("/logout")
-                      }} />
+                      }}>Logout</button>
                       </> // need to make remove "name" as well refresh as well
                   }
               </nav>
