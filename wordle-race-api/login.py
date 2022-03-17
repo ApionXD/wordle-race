@@ -59,5 +59,4 @@ def register():
 @login_blueprint.route("/logout")
 def logout():
     session.pop('username', default=None)
-    print("Done")
     return json.dumps({"response": "Success"})

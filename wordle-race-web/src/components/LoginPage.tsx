@@ -16,12 +16,10 @@ export default function LoginPage(props: LoginProps){
             axios.post("/login", request)
                 .then((response) => {
                     const status = response.data.response //made this store access token as well
-                    const token = response.data.token
                     const name = response.data.name
                     console.log(status)
                     if (status.startsWith("Success")) 
                     {
-                        sessionStorage.setItem("token", token);
                         sessionStorage.setItem("name", name)
                         navigate("/")
                         window.location.reload(); 

@@ -7,15 +7,16 @@ import WordleBoard from "./components/WordleBoard";
 import LoginPage from "./components/LoginPage"
 import RegisterPage from "./components/RegisterPage"
 import Button from "./components/Button"
+import LogoutPage from './components/Logout';
 
 function App() {
-  const token = sessionStorage.getItem("token")
+  const name = sessionStorage.getItem("name")
   return (
     <div className="App">
       <Routes>
           <Route path={"/"} element={
               <nav>
-                  { token=="" || token==undefined ?
+                  { name=="" || name==undefined ?
                     <>
                     <Link to={"board"}>Board</Link><br/>
                     <Link to={"login"}>Login</Link><br />
@@ -25,8 +26,8 @@ function App() {
                       <>
                       <label>Hello { sessionStorage.getItem("name")}<br/> 
                       <Link to={"board"}>Board</Link><br/>
-                      </label><Button color='green' text='Logout' onClick={() => logout()} />
-                      </> // need to make remove "name" as well refresh as well
+                      </label><LogoutPage/>
+                      </> 
                   }
               </nav>
           }/>
@@ -53,12 +54,4 @@ function App() {
 export default App;
 
 
-
-
-function logout(): any 
-{
-    sessionStorage.setItem("token", "");
-    sessionStorage.setItem("name", "");
-    window.location.reload(); 
-}
 
