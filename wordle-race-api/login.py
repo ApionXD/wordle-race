@@ -25,7 +25,7 @@ def login():
         return json.dumps({"response": "No such user"})
     if user["password_hash"] != password_hash:
         return json.dumps({"response": "Incorrect password"})
-    if "remember_me" in user_details:
+    if user_details["keep_session"] == 'on':
         session.permanent = True
     session["signed_in"] = True
     session["username"] = user_details["username"]
@@ -59,4 +59,23 @@ def register():
     user_collection.insert_one(user_obj)
     return json.dumps({"response": "Success"})
 
+@login_blueprint.route("/check_session", methods=['GET'])
+def check_session():
+    if "signed_in" in session and session["signed_in"]:
+        return json.dumps({
+            "response": "Success",
+            "username": session["username"]
+        })
+    else:
+        return json.dumps({
+            "response": "No session found"
+         })
+
+
+@login_blueprint.route("/logout", methods=['GET'])
+def logout():
+    session.clear()
+    return json.dumps({
+        "response": "Logged out"
+    })
 

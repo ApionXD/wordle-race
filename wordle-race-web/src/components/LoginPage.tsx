@@ -21,7 +21,8 @@ export default function LoginPage(props: LoginProps){
             event.preventDefault()
             let request = {
                 "username": event.target.usernameForm.value,
-                "password": event.target.passwordForm.value
+                "password": event.target.passwordForm.value,
+                "keep_session": event.target.rememberMe.value
             }
             axios.post("/login", request)
                 .then((response) => {
@@ -40,7 +41,9 @@ export default function LoginPage(props: LoginProps){
             <input type={"text"} id={"usernameForm"} name={"usernameForm"}/> <br/>
             <label htmlFor={"passwordForm"}>Password</label> <br/>
             <input type={"password"} id={"passwordForm"} name={"passwordForm"}/><br/>
-            <input type={"submit"} value={"Submit"}/>
+            <input type={"submit"} value={"Submit"}/> <br/>
+            <input type={"radio"} id={"rememberMe"} name={"rememberMe"}/>
+            <label htmlFor={"rememberMe"}>Remember Me</label>
         </form>
     </div>)
 }
