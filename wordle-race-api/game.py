@@ -24,7 +24,7 @@ class Game:
 @game_blueprint.route("/newgame", methods=['POST'])
 def new_game():
     game_request = request.json
-    game = Game("Apion", "Apion2", 5)
+    game = Game("test1", "test2", 5)
     current_games.append(game)
 
     return json.dumps({
@@ -38,7 +38,9 @@ def check_endpoint():
     game = getGameByUser(check_request["user"])
     guess = request.json['guess']
     board = game.boards[game.player1_board] if game.player1 == check_request["user"] else game.boards[game.player2_board]
-    return str(board.verifyGuess(guess))
+    return json.dumps({
+        "response": board.verifyGuess(guess)
+    })
 
 def getGameByUser(user):
     for x in current_games:
