@@ -1,12 +1,21 @@
 import React from "react";
 import axios from "axios";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+import {GlobalState, useStateMachine} from "little-state-machine";
 
 type LoginProps = {
 
 }
+const updateName = (state: GlobalState, new_username: string) => ({
+    ...state,
+    username: new_username
+});
+
 export default function LoginPage(props: LoginProps){
     const navigate = useNavigate()
+    let {actions, state} = useStateMachine({
+        updateName
+    })
     const submit = (event: any) => {
             event.preventDefault()
             let request = {
@@ -18,6 +27,8 @@ export default function LoginPage(props: LoginProps){
                     const status = response.data.response
                     console.log(status)
                     if (status === "Success") {
+                        actions.updateName(response.data.user)
+                        console.log(state.username)
                         navigate("/")
                     }
                 })

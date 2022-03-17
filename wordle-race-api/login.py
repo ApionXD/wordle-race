@@ -28,7 +28,10 @@ def login():
         session.permanent = True
     session["signed_in"] = True
     session["username"] = user_details["username"]
-    return json.dumps({"response": "Success"})
+    return json.dumps({
+        "response": "Success",
+        "user": user_details["username"]
+    })
 
 
 @login_blueprint.route("/register", methods=['POST'])
