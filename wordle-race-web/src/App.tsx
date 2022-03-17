@@ -7,6 +7,7 @@ import LoginPage from "./components/LoginPage"
 import {createStore, StateMachineProvider, useStateMachine, GlobalState} from "little-state-machine";
 import RegisterPage from "./components/RegisterPage"
 import Homepage from "./components/Homepage";
+import SessionRestore from "./wrappers/SessionRestore";
 
 createStore({
     username: undefined
@@ -15,28 +16,28 @@ createStore({
 function App() {
   return (
     <StateMachineProvider>
-        <div className="App">
-        <Routes>
-            <Route path={"/"} element={
-                <Homepage/>
-            }/>
-            <Route path={"/board"} element={
-                <div>
-                    <WordleBoard length={5} height={5} />
-                </div>
-            }> </Route>
-            <Route path={"/login"} element={
-                <div>
-                    <LoginPage/>
-                </div>
-            }/>
-            <Route path={"/register"} element={
-              <div>
-                  <RegisterPage/>
-              </div>
-          }/>
-        </Routes>
-        </div>
+        <SessionRestore>
+            <Routes>
+                <Route path={"/"} element={
+                    <Homepage/>
+                }/>
+                <Route path={"/board"} element={
+                    <div>
+                        <WordleBoard length={5} height={5} />
+                    </div>
+                }> </Route>
+                <Route path={"/login"} element={
+                    <div>
+                        <LoginPage/>
+                    </div>
+                }/>
+                <Route path={"/register"} element={
+                  <div>
+                      <RegisterPage/>
+                  </div>
+              }/>
+            </Routes>
+        </SessionRestore>
       </StateMachineProvider>
   );
 }
