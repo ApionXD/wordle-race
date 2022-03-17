@@ -1,12 +1,22 @@
 import React from "react";
 import axios from "axios";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+import {GlobalState, useStateMachine} from "little-state-machine";
+
 
 type LoginProps = {
 
 }
+const updateName = (state: GlobalState, new_username: string) => ({
+    ...state,
+    username: new_username
+});
+
 export default function LoginPage(props: LoginProps){
     const navigate = useNavigate()
+    let {actions, state} = useStateMachine({
+        updateName
+    })
     const submit = (event: any) => {
             event.preventDefault()
             let request = {
@@ -19,12 +29,13 @@ export default function LoginPage(props: LoginProps){
                     const token = response.data.token
                     const name = response.data.name
                     console.log(status)
-                    if (status.startsWith("Success")) 
-                    {
+                    if (status === "Success") {
                         sessionStorage.setItem("token", token);
                         sessionStorage.setItem("name", name)
+                        actions.updateName(response.data.user)
+                        console.log(state.username)
                         navigate("/")
-                        window.location.reload(); 
+                        window.location.reload();
                         //document.location.reload() BAd way to reload to save changes need to think of different way
                     }
                 })

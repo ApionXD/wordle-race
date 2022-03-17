@@ -32,9 +32,12 @@ def login():
         session.permanent = True
     session["signed_in"] = True
     session["username"] = user_details["username"]
-
     access_token = create_access_token(identity=user_details["username"])
-    return json.dumps({"response": "Success", "token": access_token, "name": user_details["username"]})
+    return json.dumps({
+        "response": "Success",
+        "user": user_details["username"],
+        "token": access_token
+    })
 
 
 @login_blueprint.route("/register", methods=['POST'])
