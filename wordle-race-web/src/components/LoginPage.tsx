@@ -25,18 +25,11 @@ export default function LoginPage(props: LoginProps){
             }
             axios.post("/login", request)
                 .then((response) => {
-                    const status = response.data.response //made this store access token as well
-                    const token = response.data.token
-                    const name = response.data.name
+                    let status = response.data.response
                     console.log(status)
                     if (status === "Success") {
-                        sessionStorage.setItem("token", token);
-                        sessionStorage.setItem("name", name)
                         actions.updateName(response.data.user)
-                        console.log(state.username)
                         navigate("/")
-                        window.location.reload();
-                        //document.location.reload() BAd way to reload to save changes need to think of different way
                     }
                 })
         }

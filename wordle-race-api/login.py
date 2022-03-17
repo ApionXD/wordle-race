@@ -5,13 +5,10 @@ from flask import Flask, request, Blueprint, session
 from database import db
 from hashlib import sha256
 
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
 
 login_blueprint = Blueprint('login_blueprint', __name__)
 user_collection = db["users"]
-hasher = sha256()
+
 
 @login_blueprint.route("/login", methods = ['POST'])
 def login():
@@ -32,11 +29,9 @@ def login():
         session.permanent = True
     session["signed_in"] = True
     session["username"] = user_details["username"]
-    access_token = create_access_token(identity=user_details["username"])
     return json.dumps({
         "response": "Success",
         "user": user_details["username"],
-        "token": access_token
     })
 
 

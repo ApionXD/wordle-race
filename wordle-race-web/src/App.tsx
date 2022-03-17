@@ -1,36 +1,24 @@
 import React from 'react';
 import './App.css';
-import {Link, Routes, Outlet} from "react-router-dom";
+import {Routes} from "react-router-dom";
 import {Route} from "react-router";
-import WordRow from "./components/WordRow";
 import WordleBoard from "./components/WordleBoard";
 import LoginPage from "./components/LoginPage"
 import {createStore, StateMachineProvider, useStateMachine, GlobalState} from "little-state-machine";
 import RegisterPage from "./components/RegisterPage"
-import Button from "./components/Button"
+import Homepage from "./components/Homepage";
+
+createStore({
+    username: undefined
+})
 
 function App() {
-  const token = sessionStorage.getItem("token")
   return (
     <StateMachineProvider>
         <div className="App">
         <Routes>
             <Route path={"/"} element={
-                <nav>
-                  { token=="" || token==undefined ?
-                    <>
-                    <Link to={"board"}>Board</Link><br/>
-                    <Link to={"login"}>Login</Link><br />
-                    <Link to={"register"}>Register</Link>
-                    </>
-                    :
-                      <>
-                      <label>Hello { sessionStorage.getItem("name")}<br/>
-                      <Link to={"board"}>Board</Link><br/>
-                      </label><Button color='green' text='Logout' onClick={() => logout()} />
-                      </> // need to make remove "name" as well refresh as well
-                  }
-              </nav>
+                <Homepage/>
             }/>
             <Route path={"/board"} element={
                 <div>
@@ -55,13 +43,4 @@ function App() {
 
 export default App;
 
-
-
-
-function logout(): any
-{
-    sessionStorage.setItem("token", "");
-    sessionStorage.setItem("name", "");
-    window.location.reload();
-}
 
