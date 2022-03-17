@@ -5,6 +5,10 @@ from flask import Flask, request, Blueprint, session
 from database import db
 from hashlib import sha256
 
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+
 login_blueprint = Blueprint('login_blueprint', __name__)
 user_collection = db["users"]
 hasher = sha256()
@@ -12,8 +16,8 @@ hasher = sha256()
 @login_blueprint.route("/login", methods = ['POST'])
 def login():
     user_details = request.json
-    password = user_details["password"]
-    hasher.update(password.encode(encoding='UTF-8', errors='strict'))
+    password = str(user_details["password"])
+    hasher = sha256(password.encode(encoding='UTF-8', errors='strict'))
     password_hash = hasher.hexdigest()
     # Queries db for matching user
     user = user_collection.find_one({
@@ -28,17 +32,16 @@ def login():
         session.permanent = True
     session["signed_in"] = True
     session["username"] = user_details["username"]
-    return json.dumps({
-        "response": "Success",
-        "user": user_details["username"]
-    })
+
+    access_token = create_access_token(identity=user_details["username"])
+    return json.dumps({"response": "Success", "token": access_token, "name": user_details["username"]})
 
 
 @login_blueprint.route("/register", methods=['POST'])
 def register():
     new_user = request.json
-    password = new_user["password"]
-    hasher.update(password.encode(encoding='UTF-8', errors='strict'))
+    password = str(new_user["password"])
+    hasher = sha256(password.encode(encoding='UTF-8', errors='strict'))
     password_hash = hasher.hexdigest()
     if "username" not in new_user:
         return json.dumps({"response": "No username"})

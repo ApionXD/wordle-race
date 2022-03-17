@@ -2,30 +2,24 @@ import React from "react";
 import axios from "axios";
 import {Navigate, useNavigate} from "react-router-dom";
 
-type LoginProps = {
+type RegisterProps = {
 
 }
-export default function LoginPage(props: LoginProps){
+export default function RegisterPage(props: RegisterProps){
     const navigate = useNavigate()
     const submit = (event: any) => {
             event.preventDefault()
             let request = {
                 "username": event.target.usernameForm.value,
-                "password": event.target.passwordForm.value
+                "password": event.target.passwordForm.value,
+                "email": event.target.emailForm.value
             }
-            axios.post("/login", request)
+            axios.post("/register", request)
                 .then((response) => {
-                    const status = response.data.response //made this store access token as well
-                    const token = response.data.token
-                    const name = response.data.name
+                    const status = response.data.response
                     console.log(status)
-                    if (status.startsWith("Success")) 
-                    {
-                        sessionStorage.setItem("token", token);
-                        sessionStorage.setItem("name", name)
-                        navigate("/")
-                        window.location.reload(); 
-                        //document.location.reload() BAd way to reload to save changes need to think of different way
+                    if (status === "Success") {
+                        navigate("/login")
                     }
                 })
         }
@@ -36,6 +30,8 @@ export default function LoginPage(props: LoginProps){
             <input type={"text"} id={"usernameForm"} name={"usernameForm"}/> <br/>
             <label htmlFor={"passwordForm"}>Password</label> <br/>
             <input type={"password"} id={"passwordForm"} name={"passwordForm"}/><br/>
+            <label htmlFor={"emailForm"}>Email</label> <br/>
+            <input type={"email"} id={"emailForm"} name={"emailForm"}/><br/>
             <input type={"submit"} value={"Submit"}/>
         </form>
     </div>)

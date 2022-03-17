@@ -1,4 +1,6 @@
 from flask import Flask, request, redirect
+from flask_jwt_extended import JWTManager
+
 from login import login_blueprint
 from game import game_blueprint
 from api_draft import api_blueprint
@@ -9,5 +11,8 @@ app.register_blueprint(login_blueprint)
 app.register_blueprint(api_blueprint)
 app.register_blueprint(game_blueprint)
 
+app.config["JWT_SECRET_KEY"] = app.secret_key
+jwt = JWTManager(app)
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
