@@ -28,18 +28,42 @@ def new_game():
     if len(current_games) == 0:
         game = Game("test1", "test2", 5)
         current_games.append(game)
-    else:
+    '''else:
         game = getGameByUser(game_request["user"])
         game.gen_new_board()
         game.player1_board = len(game.boards)-1
         for g in current_games:
             for b in g.boards:
-                print(b.word)
+                print(b.word)'''
 
     return json.dumps({
         "response": "Success"
     })
 
+@game_blueprint.route("/newboard", methods=['POST'])
+def new_board():
+    game_request = request.json
+    try:
+        game = getGameByUser(game_request["user"])
+        if game.player1 == game_request["user"]:
+            if game.player1_board == len(game.boards)-1:
+                game.gen_new_board()
+                game.player1_board = len(game.boards)-1
+            else:
+                game.player1_board += 1
+        else:
+            if game.player2_board == len(game.boards)-1:
+                game.gen_new_board()
+                game.player2_board = len(game.boards)-1
+            else:
+                game.player2_board += 1
+        return json.dumps({
+            "response": "Success"
+        })
+    except:
+        return json.dumps({
+            "response": "User is not in a game"
+        })
 
 @game_blueprint.route("/check", methods=['POST'])
 def check_endpoint():

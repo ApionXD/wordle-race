@@ -47,7 +47,7 @@ export default function WordleBoard(props: BoardProps) {
                     if (newRow.every((c, i, arr) => c == 2)) {
                         setResponseText("You win!")
                         render(
-                            <button onClick={()=> NewGame()}>New Game</button>
+                            <button onClick={()=> NewBoard()}>New Board</button>
                         )
                         // TODO: lock the keyboard, offer play again button
                     }
@@ -82,4 +82,15 @@ export const NewGame = () => {
         }
     })
     
+}
+
+export const NewBoard = () => {
+    axios.post('newboard', {
+        "user": "test1"
+    }).then(r => {
+        console.log(r.data)
+        if (document.location.pathname = "/board") {
+            window.location.reload()
+        }
+    })
 }
