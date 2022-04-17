@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, session
 import api_draft
 import json
 
@@ -19,19 +19,6 @@ class Game:
         new_board = api_draft.Board(self.size)
         self.boards.append(new_board)
 
-
-# TODO: add route for play again button that resets wotd
-@game_blueprint.route("/newgame", methods=['POST'])
-def new_game():
-    game_request = request.json
-    game = Game("Apion", "Apion2", 5)
-    current_games.append(game)
-
-    return json.dumps({
-        "response": "Success"
-    })
-
-
 @game_blueprint.route("/check", methods=['POST'])
 def check_endpoint():
     check_request = request.json
@@ -39,6 +26,7 @@ def check_endpoint():
     guess = request.json['guess']
     board = game.boards[game.player1_board] if game.player1 == check_request["user"] else game.boards[game.player2_board]
     return str(board.verifyGuess(guess))
+
 
 def getGameByUser(user):
     for x in current_games:
