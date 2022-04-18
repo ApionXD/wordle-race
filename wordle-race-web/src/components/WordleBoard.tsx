@@ -34,13 +34,10 @@ export default function WordleBoard(props: BoardProps) {
                     "guess": newRowWords[curRow]
                 }).then(r => {
                     console.log(r.data)
-                    let newRow = []
-                    for (let i = 0; i < r.data.length; i++) {
-                        newRow.push(r.data[i][1])
-                    }
+                    let newRow = r.data.colors
                     console.log(newRow)
                     // check if game is won
-                    if (newRow.every((c, i, arr) => c == 2)) {
+                    if (newRow.every((i: number) => i == 2)) {
                         setResponseText("You win!")
                         render(
                             <button onClick={()=> NewGame()}>New Game</button>

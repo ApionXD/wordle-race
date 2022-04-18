@@ -7,6 +7,7 @@ from flask import Blueprint, request, session
 from game import getGameByUser, Game, current_games
 
 matchmaking_blueprint = Blueprint('matchmaking_blueprint', __name__)
+# This is the list of people in the matchmaking queue
 matchmaking_queue = list()
 matchmaker_pipe = None
 
@@ -23,6 +24,8 @@ def new_game():
         "response": "Success"
     })
 '''
+
+
 def run_matchmaking(pipe):
     matchmaking_queue = list()
     while True:
@@ -54,13 +57,14 @@ def check_game():
         current_games.append(new_game)
     username = session['username']
     game = getGameByUser(username)
-    other_player =  game.player2 if game.player1 == session['username'] else game.player1
+
     if game is None:
         return json.dumps({
             "response": "Success",
             "status": "Still searching"
         })
     else:
+        other_player = game.player2 if game.player1 == session['username'] else game.player1
         return json.dumps({
             "response": "Success",
             "status": "Game found",

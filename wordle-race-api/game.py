@@ -11,8 +11,11 @@ def check_endpoint():
     check_request = request.json
     game = getGameByUser(session['username'])
     guess = request.json['guess']
-    board = game.boards[game.player1_board] if game.player1 == check_request["user"] else game.boards[game.player2_board]
-    return str(board.verifyGuess(guess))
+    board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
+    return json.dumps({
+        "response": "Success",
+        "colors": [x[1] for x in board.verifyGuess(guess)]
+    })
 
 
 def getGameByUser(user):
