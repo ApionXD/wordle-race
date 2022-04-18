@@ -1,4 +1,4 @@
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React from "react";
 import {GlobalState, useStateMachine} from "little-state-machine";
 import axios from "axios";
@@ -10,11 +10,19 @@ const logOut = (state: GlobalState) => ({
     ...state,
     username: undefined
 });
+const setGameDetails = (state: GlobalState, opponentName: string) => ({
+    ...state,
+    gameDetails: {
+        opponent: opponentName
+    }
+});
 
 export default function Homepage(props: HomepageProps) {
     let {actions, state} = useStateMachine({
-        logOut
+        logOut,
+        setGameDetails
     })
+    const navigate = useNavigate()
     return (
         <nav>
                   { !state.username ?
@@ -35,6 +43,8 @@ export default function Homepage(props: HomepageProps) {
                                           if (response.data.status === "Game found") {
                                               clearInterval(checkInterval)
                                               console.log("Game found!")
+                                              actions.setGameDetails(response.data.opponentName)
+                                              navigate("/play")
                                           }
                                       })
                                   }, 10000)

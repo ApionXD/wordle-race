@@ -54,6 +54,7 @@ def check_game():
         current_games.append(new_game)
     username = session['username']
     game = getGameByUser(username)
+    other_player =  game.player2 if game.player1 == session['username'] else game.player1
     if game is None:
         return json.dumps({
             "response": "Success",
@@ -62,6 +63,7 @@ def check_game():
     else:
         return json.dumps({
             "response": "Success",
-            "status": "Game found"
+            "status": "Game found",
+            "opponentName": other_player
         })
 
