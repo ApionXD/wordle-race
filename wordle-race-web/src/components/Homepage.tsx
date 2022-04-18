@@ -25,12 +25,29 @@ export default function Homepage(props: HomepageProps) {
                     </>
                     :
                       <>
-                      <label>Hello { state.username}<br/>
-                      <Link to={"board"}>Board</Link><br/>
-                      </label><button style={{backgroundColor: "green"}} onClick={() => {
-                      actions.logOut(undefined)
-                      axios.get("/logout")
-                      }}>Logout</button>
+                      <label>Hello { state.username}<br/></label>
+                      <button style={{backgroundColor: "green"}} onClick={() => {
+                          axios.post("/queue").then((response) => {
+                              if (response.data.response === "Success") {
+                                  let checkInterval = setInterval(() => {
+                                      axios.get("/check_game").then((response) => {
+                                          console.log(response.data)
+                                          if (response.data.status === "Game found") {
+                                              clearInterval(checkInterval)
+                                              console.log("Game found!")
+                                          }
+                                      })
+                                  }, 10000)
+                              }
+                          })
+
+                      }}>
+                      Play</button>
+                      <button style={{backgroundColor: "green"}} onClick={() => {
+                          actions.logOut(undefined)
+                          axios.get("/logout")
+                      }}>
+                      Logout</button>
                       </> // need to make remove "name" as well refresh as well
                   }
               </nav>

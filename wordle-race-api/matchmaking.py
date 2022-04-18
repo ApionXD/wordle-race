@@ -1,8 +1,10 @@
 import asyncio
 import json
+import uuid
+
 from flask import Blueprint, request, session
 
-from game import current_games, Game
+from game import getGameByUser, Game, current_games
 
 matchmaking_blueprint = Blueprint('matchmaking_blueprint', __name__)
 matchmaking_queue = list()
@@ -41,4 +43,25 @@ def queue_endpoint():
     return json.dumps({
         "response": "Success",
     })
+
+
+@matchmaking_blueprint.route("/check_game", methods=['GET'])
+def check_game():
+    pipe = matchmaker_pipe
+    if pipe.poll():
+        user_pair = pipe.recv()
+        new_game = Game(user_pair[0], user_pair[1], 5)
+        current_games.append(new_game)
+    username = session['username']
+    game = getGameByUser(username)
+    if game is None:
+        return json.dumps({
+            "response": "Success",
+            "status": "Still searching"
+        })
+    else:
+        return json.dumps({
+            "response": "Success",
+            "status": "Game found"
+        })
 
