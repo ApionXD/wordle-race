@@ -23,3 +23,4 @@ yarn-debug.log*
 yarn-error.log*
 /wordle-race-web/node_modules/
 /.idea/workspace.xml
+/wordle-race-api/venv/

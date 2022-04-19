@@ -8,9 +8,11 @@ import {createStore, StateMachineProvider, useStateMachine, GlobalState} from "l
 import RegisterPage from "./components/RegisterPage"
 import Homepage from "./components/Homepage";
 import SessionRestore from "./wrappers/SessionRestore";
+import PlayPage from "./components/PlayPage";
 
 createStore({
-    username: undefined
+    username: undefined,
+    gameDetails: undefined
 })
 
 function App() {
@@ -34,6 +36,11 @@ function App() {
                 <Route path={"/register"} element={
                   <div>
                       <RegisterPage/>
+                  </div>
+              }/>
+                <Route path={"/play"} element={
+                  <div>
+                      <PlayPage/>
                   </div>
               }/>
             </Routes>

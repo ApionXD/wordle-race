@@ -2,21 +2,19 @@ import React, {ReactElement, useEffect, useState} from 'react'
 import WordRow from "./WordRow";
 import axios from "axios";
 import { render } from '@testing-library/react';
-import { useNavigate } from "react-router-dom";
-import {GlobalState, StateMachineProvider, useStateMachine} from "little-state-machine";
+import { useNavigate } from "react-router-dom"
+import {useStateMachine} from "little-state-machine";
 
 type BoardProps = {
     length: number
     height: number
 }
-
 export default function WordleBoard(props: BoardProps) {
-    const { state } = useStateMachine();
+    const { state } =useStateMachine()
     const [rowWords, setRowWords]: [string[], any] = useState([])
     const [rowColors, setRowColors]: [number[][], any] = useState([])
     const [curRow, setCurRow]: [number, any] = useState(0)
     const [responseText, setResponseText] = useState("")
-
     let rows: ReactElement[] = []
     for (let i = 0; i < props.length; i++) {
         rows.push(<WordRow length={props.length} letters={rowWords[i]} colors={rowColors[i]}/>)
@@ -35,19 +33,17 @@ export default function WordleBoard(props: BoardProps) {
         if (event.key == 'Enter') {
             if (newRowWords[curRow].length == 5) {
                 axios.post('/check', {
-                    "guess": newRowWords[curRow],
-                    "user": state.username
+                    "id": state?.gameDetails?.id,
+                    "guess": newRowWords[curRow]
                 }).then(r => {
-                    let newRow = []
-                    for (let i = 0; i < r.data.response.length; i++) {
-                        newRow.push(r.data.response[i][1])
-                    }
+                    console.log(r.data)
+                    let newRow = r.data.colors
                     console.log(newRow)
                     // check if game is won
-                    if (newRow.every((c, i, arr) => c == 2)) {
+                    if (newRow.every((i: number) => i == 2)) {
                         setResponseText("You win!")
                         render(
-                            <button onClick={()=> NewBoard()}>New Board</button>
+                            <button onClick={()=> NewGame()}>New Game</button>
                         )
                         // TODO: lock the keyboard, offer play again button
                     }
@@ -72,25 +68,11 @@ export default function WordleBoard(props: BoardProps) {
     </div>
 }
 
-export const NewGame = () => {
+function NewGame() {
     axios.post('/newgame', {
-        "user": "test1"
+        "check": ''
     }).then(r => {
         console.log(r.data)
-        if (document.location.pathname = "/board") {
-            window.location.reload()
-        }
     })
-    
-}
-
-export const NewBoard = () => {
-    axios.post('newboard', {
-        "user": "test1"
-    }).then(r => {
-        console.log(r.data)
-        if (document.location.pathname = "/board") {
-            window.location.reload()
-        }
-    })
+    window.location.reload()
 }

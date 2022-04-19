@@ -1,9 +1,7 @@
-import {Link} from "react-router-dom";
-import Button from "./Button";
+import {Link, useNavigate} from "react-router-dom";
 import React from "react";
 import {GlobalState, useStateMachine} from "little-state-machine";
 import axios from "axios";
-import {NewGame} from "./WordleBoard";
 
 type HomepageProps = {
 
@@ -12,11 +10,28 @@ const logOut = (state: GlobalState) => ({
     ...state,
     username: undefined
 });
+const setGameOpponent = (state: GlobalState, opponentName: string) => ({
+    ...state,
+    gameDetails: {
+        ...state.gameDetails,
+        opponent: opponentName
+    }
+});
+const setGameId = (state: GlobalState, id: string) => ({
+    ...state,
+    gameDetails: {
+        ...state.gameDetails,
+        id: id
+    }
+});
 
 export default function Homepage(props: HomepageProps) {
     let {actions, state} = useStateMachine({
-        logOut
+        logOut,
+        setGameOpponent,
+        setGameId
     })
+    const navigate = useNavigate()
     return (
         <nav>
                   { !state.username ?
@@ -27,12 +42,32 @@ export default function Homepage(props: HomepageProps) {
                     </>
                     :
                       <>
-                      <label>Hello { state.username}<br/>
-                      <Link to={"board"} onClick={NewGame}>Board</Link><br/>
-                      </label><Button color='green' text='Logout' onClick={() => {
-                      actions.logOut(undefined)
-                      axios.get("/logout")
-                      }} />
+                      <label>Hello { state.username}<br/></label>
+                      <button style={{backgroundColor: "green"}} onClick={() => {
+                          axios.post("/queue").then((response) => {
+                              if (response.data.response === "Success") {
+                                  let checkInterval = setInterval(() => {
+                                      axios.get("/check_game").then((response) => {
+                                          console.log(response.data)
+                                          if (response.data.status === "Game found") {
+                                              clearInterval(checkInterval)
+                                              console.log("Game found!")
+                                              actions.setGameOpponent(response.data.opponentName)
+                                              actions.setGameId(response.data.id)
+                                              navigate("/play")
+                                          }
+                                      })
+                                  }, 10000)
+                              }
+                          })
+
+                      }}>
+                      Play</button>
+                      <button style={{backgroundColor: "green"}} onClick={() => {
+                          actions.logOut(undefined)
+                          axios.get("/logout")
+                      }}>
+                      Logout</button>
                       </> // need to make remove "name" as well refresh as well
                   }
               </nav>
