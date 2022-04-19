@@ -4,7 +4,7 @@ import uuid
 
 from flask import Blueprint, request, session
 
-from game import getGameByUser, Game, current_games
+from game import getGameByUser, Game, add_game
 
 matchmaking_blueprint = Blueprint('matchmaking_blueprint', __name__)
 # This is the list of people in the matchmaking queue
@@ -31,11 +31,12 @@ def run_matchmaking(pipe):
     while True:
         if pipe.poll():
             new_user = pipe.recv()
-            matchmaking_queue.append(new_user)
-            print(f"Added {new_user} to match making!")
+            if new_user not in matchmaking_queue:
+                matchmaking_queue.append(new_user)
+                print(f"Added {new_user} to match making!")
         if len(matchmaking_queue) >= 2:
             pipe.send([matchmaking_queue[0], matchmaking_queue[1]])
-            print(f"Matched {matchmaking_queue[0]} and {matchmaking_queue[0]}")
+            print(f"Matched {matchmaking_queue[0]} and {matchmaking_queue[1]}")
             matchmaking_queue = matchmaking_queue[2:]
 
 
@@ -54,7 +55,7 @@ def check_game():
     if pipe.poll():
         user_pair = pipe.recv()
         new_game = Game(user_pair[0], user_pair[1], 5)
-        current_games.append(new_game)
+        add_game(new_game)
     username = session['username']
     game = getGameByUser(username)
 
@@ -68,6 +69,7 @@ def check_game():
         return json.dumps({
             "response": "Success",
             "status": "Game found",
+            "id": str(game.id),
             "opponentName": other_player
         })
 

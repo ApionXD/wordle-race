@@ -3,12 +3,14 @@ import WordRow from "./WordRow";
 import axios from "axios";
 import { render } from '@testing-library/react';
 import { useNavigate } from "react-router-dom"
+import {useStateMachine} from "little-state-machine";
 
 type BoardProps = {
     length: number
     height: number
 }
 export default function WordleBoard(props: BoardProps) {
+    const { state } =useStateMachine()
     const [rowWords, setRowWords]: [string[], any] = useState([])
     const [rowColors, setRowColors]: [number[][], any] = useState([])
     const [curRow, setCurRow]: [number, any] = useState(0)
@@ -31,6 +33,7 @@ export default function WordleBoard(props: BoardProps) {
         if (event.key == 'Enter') {
             if (newRowWords[curRow].length == 5) {
                 axios.post('/check', {
+                    "id": state?.gameDetails?.id,
                     "guess": newRowWords[curRow]
                 }).then(r => {
                     console.log(r.data)

@@ -10,17 +10,26 @@ const logOut = (state: GlobalState) => ({
     ...state,
     username: undefined
 });
-const setGameDetails = (state: GlobalState, opponentName: string) => ({
+const setGameOpponent = (state: GlobalState, opponentName: string) => ({
     ...state,
     gameDetails: {
+        ...state.gameDetails,
         opponent: opponentName
+    }
+});
+const setGameId = (state: GlobalState, id: string) => ({
+    ...state,
+    gameDetails: {
+        ...state.gameDetails,
+        id: id
     }
 });
 
 export default function Homepage(props: HomepageProps) {
     let {actions, state} = useStateMachine({
         logOut,
-        setGameDetails
+        setGameOpponent,
+        setGameId
     })
     const navigate = useNavigate()
     return (
@@ -43,7 +52,8 @@ export default function Homepage(props: HomepageProps) {
                                           if (response.data.status === "Game found") {
                                               clearInterval(checkInterval)
                                               console.log("Game found!")
-                                              actions.setGameDetails(response.data.opponentName)
+                                              actions.setGameOpponent(response.data.opponentName)
+                                              actions.setGameId(response.data.id)
                                               navigate("/play")
                                           }
                                       })
