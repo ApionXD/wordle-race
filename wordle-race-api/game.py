@@ -17,7 +17,6 @@ def check_endpoint():
         "colors": [x[1] for x in board.verifyGuess(guess)]
     })
 
-
 def getGameByUser(user):
     for x in current_games:
         if x.player1 == user  or x.player2 == user:

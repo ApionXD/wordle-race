@@ -42,6 +42,7 @@ def run_matchmaking(pipe):
 @matchmaking_blueprint.route("/queue", methods=['POST'])
 def queue_endpoint():
     username = session['username']
+    session['boardsize'] = request.json['boardsize']
     matchmaker_pipe.send(username)
     return json.dumps({
         "response": "Success",
@@ -53,7 +54,8 @@ def check_game():
     pipe = matchmaker_pipe
     if pipe.poll():
         user_pair = pipe.recv()
-        new_game = Game(user_pair[0], user_pair[1], 5)
+        new_game = Game(user_pair[0], user_pair[1], session['boardsize'])
+        print(session['boardsize'])
         current_games.append(new_game)
     username = session['username']
     game = getGameByUser(username)

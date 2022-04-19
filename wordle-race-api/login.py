@@ -29,6 +29,7 @@ def login():
         session.permanent = True
     session["signed_in"] = True
     session["username"] = user_details["username"]
+    session["boardsize"] = 5
     return json.dumps({
         "response": "Success",
         "user": user_details["username"],

@@ -35,7 +35,9 @@ export default function Homepage(props: HomepageProps) {
                       <>
                       <label>Hello { state.username}<br/></label>
                       <button style={{backgroundColor: "green"}} onClick={() => {
-                          axios.post("/queue").then((response) => {
+                          axios.post("/queue", {
+                              "boardsize": state?.gameDetails?.boardsize
+                            }).then((response) => {
                               if (response.data.response === "Success") {
                                   let checkInterval = setInterval(() => {
                                       axios.get("/check_game").then((response) => {
@@ -58,6 +60,7 @@ export default function Homepage(props: HomepageProps) {
                           axios.get("/logout")
                       }}>
                       Logout</button>
+                      <br/><Link to={"board"}>Board Size</Link><br/>
                       </> // need to make remove "name" as well refresh as well
                   }
               </nav>
