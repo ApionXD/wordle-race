@@ -5,7 +5,8 @@ declare module 'little-state-machine' {
     username: string | undefined
     gameDetails: {
       opponent?: string,
-      boardsize?: number
+      boardsize?: number,
+      id?: string
     } | undefined
   }
 }
