@@ -78,7 +78,7 @@ export default function WordleBoard(props: BoardProps) {
                 setResponseText("Please enter a word of correct length")
             }
         }
-        else if (event.key.length == 1 && event.key.match("[a-zA-Z]+")?.length == 1 && (!newRowWords[curRow] || newRowWords[curRow].length<5)) {
+        else if (event.key.length == 1 && event.key.match("[a-zA-Z]+")?.length == 1 && (!newRowWords[curRow] || newRowWords[curRow].length<props.length)) {
             newRowWords[curRow] = newRowWords[curRow] ? newRowWords[curRow] + event.key.toUpperCase() : event.key.toUpperCase()
             if (newRowWords[curRow].length>5)
             {

@@ -10,6 +10,7 @@ type BoardSizeProps = {
 const setBoardSize = (state:GlobalState, boardSize: number) => ({
     ...state,
     gameDetails: {
+        ...state.gameDetails,
         boardsize: boardSize
     }
 })
