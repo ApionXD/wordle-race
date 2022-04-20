@@ -1,6 +1,4 @@
-import asyncio
 import json
-import uuid
 
 from flask import Blueprint, request, session
 
@@ -27,28 +25,36 @@ def new_game():
 
 
 def run_matchmaking(pipe):
-    matchmaking_queue = list()
+    matchmaking_queue = dict()
+    matchmaking_queue[4] = list()
+    matchmaking_queue[5] = list()
+    matchmaking_queue[6] = list()
     while True:
         if pipe.poll():
-            new_user = pipe.recv()
-            if new_user not in matchmaking_queue:
-                matchmaking_queue.append(new_user)
-                print(f"Added {new_user} to match making!")
-        if len(matchmaking_queue) >= 2:
-            pipe.send([matchmaking_queue[0], matchmaking_queue[1]])
-            print(f"Matched {matchmaking_queue[0]} and {matchmaking_queue[1]}")
-            matchmaking_queue = matchmaking_queue[2:]
+            queue_request = pipe.recv()
+            queued_users = matchmaking_queue[queue_request[1]]
+            new_user = queue_request[0]
+            already_queued = False
+            for x in matchmaking_queue.values():
+                if new_user in x:
+                    already_queued = True
+                    break
+
+            if not already_queued:
+                queued_users.append(new_user)
+                print(f"Added {new_user} to match making for {queue_request[1]} letter!")
+        for i, x in matchmaking_queue.items():
+            if len(x) >= 2:
+                pipe.send([x[0], x[1], i])
+                print(f"Matched {x[0]} and {x[1]}")
+                matchmaking_queue[i] = x[2:]
 
 
 @matchmaking_blueprint.route("/queue", methods=['POST'])
 def queue_endpoint():
     username = session['username']
-    session['boardsize'] = request.json['boardsize']
-    matchmaker_pipe.send(username)
-    # default game for testing v
-    new_game = Game(session['username'], session['username'], size=session['boardsize'])
-    add_game(new_game)
-    # default game for testing ^
+    board_size = request.json['boardSize']
+    matchmaker_pipe.send((username, board_size))
     return json.dumps({
         "response": "Success",
     })
@@ -59,7 +65,7 @@ def check_game():
     pipe = matchmaker_pipe
     if pipe.poll():
         user_pair = pipe.recv()
-        new_game = Game(user_pair[0], user_pair[1], session['boardsize'])
+        new_game = Game(user_pair[0], user_pair[1],user_pair[2])
         add_game(new_game)
     username = session['username']
     game = getGameByUser(username)

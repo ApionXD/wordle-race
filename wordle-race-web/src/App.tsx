@@ -4,8 +4,8 @@ import {Routes} from "react-router-dom";
 import {Route} from "react-router";
 import WordleBoard from "./components/WordleBoard";
 import LoginPage from "./components/LoginPage"
-import BoardSizePage from "./components/BoardSizePage"
-import {createStore, StateMachineProvider, useStateMachine, GlobalState} from "little-state-machine";
+import QueuePage from "./components/QueuePage"
+import {createStore, StateMachineProvider} from "little-state-machine";
 import RegisterPage from "./components/RegisterPage"
 import Homepage from "./components/Homepage";
 import SessionRestore from "./wrappers/SessionRestore";
@@ -26,7 +26,7 @@ function App() {
                 }/>
                 <Route path={"/board"} element={
                     <div>
-                        <BoardSizePage/>
+                        <QueuePage/>
                     </div>
                 }> </Route>
                 <Route path={"/oldboard"} element={
@@ -47,6 +47,11 @@ function App() {
                 <Route path={"/play"} element={
                   <div>
                       <PlayPage/>
+                  </div>
+              }/>
+                <Route path={"/prequeue"} element={
+                  <div>
+                      <QueuePage/>
                   </div>
               }/>
             </Routes>
