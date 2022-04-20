@@ -16,7 +16,7 @@ def check_endpoint():
     game_status = game_statuses[check_request['id']]
     game = getGameByUser(session['username'])
     player = game.player1 if game.player1 == session['username'] else game.player2
-    game_score = [game.player1score if game.player1==player else game.player2score, [-1]]
+
     if game_status == "Completed":
         return json.dumps({
             "response": "Time's up",
@@ -37,15 +37,30 @@ def check_endpoint():
     guess = request.json['guess']
     board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
     checkedGuess = board.verifyGuess(guess)
+
     if (checkedGuess==0):
         return json.dumps({
             "response": "Failure",
             "colors": [0]
         })
-    numGood = 0
-    row = check_request['curRow']
+
+    game_score = [game.player1score if game.player1 == player else game.player2score, [-1]]  # gets current score
+    row = check_request['curRow'] #sees the row we are on
+    game_score = score_game(game_score, checkedGuess, row) #gives points for the game
+    if game.player1 == player:
+        game.player1score = game_score[0]
+    else:
+        game.player2score = game_score[0]
+
+    return json.dumps({
+        "response": "Success",
+        "colors": [x[1] for x in checkedGuess],
+        "score": game_score[0]
+    })
+
+def score_game(game_score, checkedGuess, row):
     pointsAdded = 1
-    if row == 0: #points based on rows
+    if row == 0:  # points based on rows
         pointsAdded *= 5
     elif row == 1:
         pointsAdded *= 4
@@ -53,24 +68,16 @@ def check_endpoint():
         pointsAdded *= 3
     elif row == 3:
         pointsAdded *= 2
-    for x in range(len(checkedGuess)): #currently only gives points for greens
-        if checkedGuess[x][1]==2 and not x in game_score[1]:
+    for x in range(len(checkedGuess)):  # currently only gives points for greens
+        if checkedGuess[x][1] == 2 and not x in game_score[1]:
             game_score[1].append(x)
-            game_score = [pointsAdded+game_score[0], game_score[1]]
-    if len(game_score[1])-1==len(guess) or row==4: #resets what is already known green for new game
+            game_score = [pointsAdded + game_score[0], game_score[1]]
+    if len(game_score[1]) - 1 == len(checkedGuess) or row == 4:  # resets what is already known green for new game
         game_score[1] = [-1]
-        if row==0: #gives extra points if solved it right on first try
-            game_score[0]*=2
-    print(game_score[0])
-    if game.player1 == player:
-        game.player1score = game_score[0]
-    else:
-        game.player2score = game_score[0]
-    return json.dumps({
-        "response": "Success",
-        "colors": [x[1] for x in checkedGuess],
-        "score": game_score[0]
-    })
+        if row == 0:  # gives extra points if solved it right on first try
+            game_score[0] *= 2
+    return game_score
+
 
 def add_game(game):
     current_games.append(game)
