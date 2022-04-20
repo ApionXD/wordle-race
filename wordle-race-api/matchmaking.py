@@ -45,8 +45,10 @@ def queue_endpoint():
     username = session['username']
     session['boardsize'] = request.json['boardsize']
     matchmaker_pipe.send(username)
-    new_game = Game(session['username'], session['username'], session['boardsize'])
+    # default game for testing v
+    new_game = Game(session['username'], session['username'], size=session['boardsize'])
     add_game(new_game)
+    # default game for testing ^
     return json.dumps({
         "response": "Success",
     })

@@ -52,22 +52,32 @@ export default function WordleBoard(props: BoardProps) {
                             if (wonGame)
                             {
                                 setResponseText("You win!")
+                                NewGame()
+                                setTimeout(function() {
+                                    for (let i = 0; i < 5; i++) {
+                                        newRowWords[i] = ""
+                                        newRowColors[i] = new Array(newRowColors[i].length).fill(0)
+                                    }
+                                    setRowColors(newRowColors)
+                                    props.height = 5
+                            }, 2000)
                             }
-                            render(
-                                <button onClick={()=> NewGame()}>New Game</button>
-                            )
-
+                            
                             // TODO: lock the keyboard, offer play again button
                         }
                         newRowColors[curRow] = newRow
                         setRowColors(newRowColors)
-                        setCurRow(curRow + 1)
+                        if (!wonGame)
+                            setCurRow(curRow + 1)
+                        else
+                            setCurRow(0)
                         setResponseText("")
                     }
                     else
                     {
                         let temp = newRowWords[curRow]
                         newRowWords[curRow] = ""
+                        console.log(newRowColors[curRow])
                         setResponseText(temp.at(0)+temp.substring(1).toLowerCase()+" is not a word")
                         
                     }
@@ -85,21 +95,21 @@ export default function WordleBoard(props: BoardProps) {
                 newRowWords[curRow].slice(0, -1)
             }
         }
-
         setRowWords(newRowWords)
         console.log(rowWords[curRow])
+        useEffect(() => {
+            console.log("Board updates")
+        })
     }} tabIndex={0}>
         <p>{responseText}</p>
         {rows}
-        <p>Score: {score}</p>
+        <label>Score: {score}</label>
     </div>
+    
 }
 
 function NewGame() {
-    axios.post('/newgame', {
-        "check": ''
-    }).then(r => {
+    axios.post('/newboard').then(r => {
         console.log(r.data)
     })
-    window.location.reload()
 }

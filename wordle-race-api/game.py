@@ -79,6 +79,25 @@ def score_game(game_score, checkedGuess, row):
     return game_score
 
 
+@game_blueprint.route("/newboard", methods=['POST'])
+def new_board():
+    game = getGameByUser(session['username'])
+    if (game.player1 == session['username']):
+        if (game.player1_board == len(game.boards)-1):
+            game.gen_new_board()
+            game.player1_board += 1
+        else:
+            game.player1_board += 1
+    else:
+        if (game.player2_board == len(game.boards)-1):
+            game.gen_new_board()
+            game.player2_board += 1
+        else:
+            game.player1_board += 1
+    return json.dumps({
+        "response": "Success"
+    })
+
 def add_game(game):
     current_games.append(game)
     game_statuses[str(game.id)] = "Active"

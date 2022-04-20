@@ -19,7 +19,12 @@ class Board:
 
     def generateword(pos=['nouns', 'verbs', 'adjectives'], length=5):
         # defaults to nouns/verbs/adjectives of length 5
-        return Board.r.word(include_parts_of_speech=pos, word_min_length=length, word_max_length=length)
+        dictionary = enchant.Dict("en_US")
+        word = Board.r.word(include_parts_of_speech=pos, word_min_length=length, word_max_length=length)
+        if dictionary.check(word):
+            return word
+        else:
+            return Board.generateword(length=length)
 
     def verifyGuess(self, guess):
         if not Board.validate(guess):
