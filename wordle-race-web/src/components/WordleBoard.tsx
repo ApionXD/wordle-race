@@ -16,12 +16,21 @@ export default function WordleBoard(props: BoardProps) {
     const [curRow, setCurRow]: [number, any] = useState(0)
     const [responseText, setResponseText] = useState("")
     const [score, setScore] = useState(0)
+    const [win, setWin] = useState(0)
     let rows: ReactElement[] = []
     for (let i = 0; i < props.height; i++) {
         rows.push(<WordRow length={props.length} letters={rowWords[i]} colors={rowColors[i]}/>)
     }
     useEffect(() => {
         console.log("Board updates")
+    })
+    useEffect(() => {
+        if (win == 1) {
+            console.log("won game")
+            setRowWords([])
+            setRowColors([])
+            setWin(0)
+        }
     })
     return <div onKeyDown={(event) => {
         console.log(event.key)
@@ -52,23 +61,26 @@ export default function WordleBoard(props: BoardProps) {
                             if (wonGame)
                             {
                                 setResponseText("You win!")
-                                NewGame()
+                                newRowColors[curRow] = newRow
+                                setRowColors(newRowColors)
                                 setTimeout(function() {
-                                    for (let i = 0; i < 5; i++) {
-                                        newRowWords[i] = ""
+                                    NewGame()
+                                    for (let i = 0; i < curRow; i++) {
                                         newRowColors[i] = new Array(newRowColors[i].length).fill(0)
                                     }
                                     setRowColors(newRowColors)
-                                    props.height = 5
-                            }, 2000)
+                                    setWin(1)
+                                }, 2000)
                             }
                             
                             // TODO: lock the keyboard, offer play again button
                         }
-                        newRowColors[curRow] = newRow
-                        setRowColors(newRowColors)
-                        if (!wonGame)
+                        if (!wonGame) {
+                            console.log('not won')
+                            newRowColors[curRow] = newRow
+                            setRowColors(newRowColors)
                             setCurRow(curRow + 1)
+                        }
                         else
                             setCurRow(0)
                         setResponseText("")
@@ -79,10 +91,8 @@ export default function WordleBoard(props: BoardProps) {
                         newRowWords[curRow] = ""
                         console.log(newRowColors[curRow])
                         setResponseText(temp.at(0)+temp.substring(1).toLowerCase()+" is not a word")
-                        
                     }
                 })
-                
             }
             else {
                 setResponseText("Please enter a word of correct length")
@@ -97,15 +107,11 @@ export default function WordleBoard(props: BoardProps) {
         }
         setRowWords(newRowWords)
         console.log(rowWords[curRow])
-        useEffect(() => {
-            console.log("Board updates")
-        })
     }} tabIndex={0}>
         <p>{responseText}</p>
         {rows}
         <label>Score: {score}</label>
     </div>
-    
 }
 
 function NewGame() {
