@@ -21,7 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Project specific
 /wordle-race-web/node_modules/
-/.idea/workspace.xml
-/wordle-race-api/venv/
-/wordle-race-api/venv/Lib/site-packages
+/.idea
+/wordle-race-api/venv
+/wordle-race-api/__pycache__
