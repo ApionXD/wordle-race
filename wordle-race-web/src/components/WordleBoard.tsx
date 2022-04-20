@@ -65,7 +65,7 @@ export default function WordleBoard(props: BoardProps) {
                                 setRowColors(newRowColors)
                                 setTimeout(function() {
                                     NewGame()
-                                    for (let i = 0; i < curRow; i++) {
+                                    for (let i = 0; i < curRow+1; i++) {
                                         newRowColors[i] = new Array(newRowColors[i].length).fill(0)
                                     }
                                     setRowColors(newRowColors)
