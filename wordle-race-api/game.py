@@ -8,7 +8,6 @@ import json
 game_blueprint = Blueprint('game_blueprint', __name__)
 current_games = list()
 game_statuses = dict()
-game_score = dict()
 user_collection = db["users"]
 
 @game_blueprint.route("/check", methods=['POST'])
@@ -17,6 +16,7 @@ def check_endpoint():
     game_status = game_statuses[check_request['id']]
     game = getGameByUser(session['username'])
     player = game.player1 if game.player1 == session['username'] else game.player2
+    game_score = [game.player1score if game.player1==player else game.player2score, [-1]]
     if game_status == "Completed":
         return json.dumps({
             "response": "Time's up",
@@ -33,9 +33,6 @@ def check_endpoint():
         return json.dumps({
             "response": "Time's up",
         })
-
-    if not player in game_score.keys():
-        game_score[player] = [0, [-1]]
 
     guess = request.json['guess']
     board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
@@ -57,18 +54,22 @@ def check_endpoint():
     elif row == 3:
         pointsAdded *= 2
     for x in range(len(checkedGuess)): #currently only gives points for greens
-        if checkedGuess[x][1]==2 and not x in game_score[player][1]:
-            game_score[player][1].append(x)
-            game_score[player] = [pointsAdded+game_score[player][0], game_score[player][1]]
-    if len(game_score[player][1])-1==len(guess) or row==4: #resets what is already known green for new game
-        game_score[player][1] = [-1]
+        if checkedGuess[x][1]==2 and not x in game_score[1]:
+            game_score[1].append(x)
+            game_score = [pointsAdded+game_score[0], game_score[1]]
+    if len(game_score[1])-1==len(guess) or row==4: #resets what is already known green for new game
+        game_score[1] = [-1]
         if row==0: #gives extra points if solved it right on first try
-            game_score[player][0]*=2
-
+            game_score[0]*=2
+    print(game_score[0])
+    if game.player1 == player:
+        game.player1score = game_score[0]
+    else:
+        game.player2score = game_score[0]
     return json.dumps({
         "response": "Success",
         "colors": [x[1] for x in checkedGuess],
-        "score": game_score[player][0]
+        "score": game_score[0]
     })
 
 def add_game(game):
@@ -105,6 +106,8 @@ class Game:
         self.player2_board = 0
         self.start_time = time.time()
         self.id = uuid.uuid4()
+        self.player1score = 0
+        self.player2score = 0
         self.gen_new_board()
 
     def gen_new_board(self):
