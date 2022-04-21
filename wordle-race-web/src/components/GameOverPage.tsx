@@ -1,6 +1,6 @@
-import React , {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import axios from "axios";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useStateMachine} from "little-state-machine";
 
 type GameOverProps = {
@@ -14,26 +14,27 @@ export default function GameOverPage(props: GameOverProps){
     const [p1Score, setPlayer1Score] = useState(0)
     const [p2Score, setPlayer2Score] = useState(0)
     const [winner, setWinner] = useState("")
-    if (winner=="")
-    {
+    useEffect(() => {
+        if (winner=="")
+        {
         axios.post('/gameresults', {
-                            "id": state?.gameDetails?.id
-                            }).then(r => {
-                                let values=r.data
-                                if (values.response=="Time Left")
-                                {
-                                    navigate('/')
-                                }
-                                else
-                                {
-                                    setPlayer1(values.player1)
-                                    setPlayer2(values.player2)
-                                    setPlayer1Score(values.player1score)
-                                    setPlayer2Score(values.player2score)
-                                    setWinner(values.winner)
-                                }
-                            })
-    }
+            "id": state?.gameDetails?.id
+            }).then(r => {
+                let values=r.data
+                if (values.response=="Time Left")
+                {
+                    navigate('/')
+                }
+                else
+                {
+                    setPlayer1(values.player1)
+                    setPlayer2(values.player2)
+                    setPlayer1Score(values.player1score)
+                    setPlayer2Score(values.player2score)
+                    setWinner(values.winner)
+                }
+            })}
+    }, [])
     const tableStyle = {
         color: 'white',
     }
