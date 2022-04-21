@@ -30,5 +30,6 @@ export default function GameOverPage(props: GameOverProps){
             </tr>
             <label>you win/lose!</label>
         </table>
+        <button onClick={() => { navigate('/')}}>Quit</button>
     </div>)
 }
