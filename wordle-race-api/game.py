@@ -9,6 +9,8 @@ game_blueprint = Blueprint('game_blueprint', __name__)
 current_games = list()
 game_statuses = dict()
 user_collection = db["users"]
+board_collection = db["boards"]
+tot_collection = db["scores"]
 
 @game_blueprint.route("/check", methods=['POST'])
 def check_endpoint():
@@ -36,6 +38,7 @@ def check_endpoint():
 
     guess = request.json['guess']
     board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
+
     checkedGuess = board.verifyGuess(guess)
 
     if (checkedGuess==0):
@@ -52,11 +55,35 @@ def check_endpoint():
     else:
         game.player2score = game_score[0]
 
+    storeInformation(game_score, checkedGuess, session['username'], game, board)
     return json.dumps({
         "response": "Success",
         "colors": [x[1] for x in checkedGuess],
         "score": game_score[0]
     })
+
+def storeInformation(score, checkedGuess, username, game, board):
+    words = ""
+    count = 0
+    for i in checkedGuess:
+        words += i[0]+str(i[1])
+        if i[1]==2:
+            count += 1
+    game.guesses.append(words)
+    if count>=len(checkedGuess) or len(game.guesses)==len(checkedGuess):
+        game.guesses.append(board.get_word())
+        board_collection.find_one_and_update({'username': username},{'$push': {'boards':game.guesses}})
+        board_collection.find_one_and_update({'username': username}, {'$push': {'score': str(score[0])}})
+        user = tot_collection.find_one({
+            "username": username
+        })
+        overallScore = user['score']
+        overallScore += score[0]
+        tot_collection.find_one_and_update({'username': username}, {'$set': {'score': overallScore}})
+        game.guesses = []
+
+
+
 
 def score_game(game_score, checkedGuess, row):
     pointsAdded = 1
@@ -70,9 +97,10 @@ def score_game(game_score, checkedGuess, row):
         pointsAdded *= 2
     for x in range(len(checkedGuess)):  # currently only gives points for greens
         if checkedGuess[x][1] == 2 and not x in game_score[1]:
+            print(checkedGuess[x])
             game_score[1].append(x)
             game_score = [pointsAdded + game_score[0], game_score[1]]
-    if len(game_score[1]) - 1 == len(checkedGuess) or row == 4:  # resets what is already known green for new game
+    if len(game_score[1]) - 1 == len(checkedGuess) or row == len(checkedGuess):  # resets what is already known green for new game
         game_score[1] = [-1]
         if row == 0:  # gives extra points if solved it right on first try
             game_score[0] *= 2
@@ -116,6 +144,7 @@ class Game:
         self.player1score = 0
         self.player2score = 0
         self.gen_new_board()
+        self.guesses = []#Stores guesses for round
 
     def gen_new_board(self):
         new_board = api_draft.Board(self.size)
