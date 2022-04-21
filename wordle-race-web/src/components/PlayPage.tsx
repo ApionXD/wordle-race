@@ -3,6 +3,7 @@ import {useState} from "react";
 import {useStateMachine} from "little-state-machine";
 import Timer from "./Timer";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 type PlayPageProp = {
 
@@ -14,6 +15,7 @@ export default function PlayPage(props: PlayPageProp) {
     const [errorText, setErrorText] = useState("")
     const [curScore, setScore] = useState(0)
     const [opponentScore, setOpScore] = useState(0)
+    const navigate = useNavigate()
     const { state } = useStateMachine()
     const checkGuess = () => {
         let guess = rowWords[curRow]
@@ -51,7 +53,7 @@ export default function PlayPage(props: PlayPageProp) {
                     setErrorText(rowWords[curRow] + " is not a word")
                 }
                 if (r.data.response == "Time's Up") {
-                    setErrorText("Time's Up")
+                    navigate("/gameover")
                 }
             })
         }
