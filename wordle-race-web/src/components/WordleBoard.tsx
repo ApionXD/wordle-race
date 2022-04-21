@@ -26,7 +26,7 @@ export default function WordleBoard(props: BoardProps) {
     })
     useEffect(() => {
         if (win == 1) {
-            console.log("won game")
+            console.log("game ended")
             setRowWords([])
             setRowColors([])
             setWin(0)
@@ -57,10 +57,23 @@ export default function WordleBoard(props: BoardProps) {
                         setScore(r.data.score)
                         // check if game is won or max size
                         let wonGame = newRow.every((i: number) => i == 2)
-                        if (wonGame || curRow>=4) {
+                        if (wonGame || curRow>=props.height-1) {
                             if (wonGame)
                             {
-                                setResponseText("You win!")
+                                setResponseText("Correct!")
+                                newRowColors[curRow] = newRow
+                                setRowColors(newRowColors)
+                                setTimeout(function() {
+                                    NewGame()
+                                    for (let i = 0; i < curRow+1; i++) {
+                                        newRowColors[i] = new Array(newRowColors[i].length).fill(0)
+                                    }
+                                    setRowColors(newRowColors)
+                                    setWin(1)
+                                }, 2000)
+                            }
+                            else {
+                                setResponseText("Out of guesses!")
                                 newRowColors[curRow] = newRow
                                 setRowColors(newRowColors)
                                 setTimeout(function() {
@@ -75,7 +88,7 @@ export default function WordleBoard(props: BoardProps) {
                             
                             // TODO: lock the keyboard, offer play again button
                         }
-                        if (!wonGame) {
+                        if (!wonGame && curRow<props.height-1) {
                             console.log('not won')
                             newRowColors[curRow] = newRow
                             setRowColors(newRowColors)
