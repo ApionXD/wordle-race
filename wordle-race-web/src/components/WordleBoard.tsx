@@ -11,6 +11,7 @@ type BoardProps = {
 }
 export default function WordleBoard(props: BoardProps) {
     const { state } =useStateMachine()
+    const navigate = useNavigate()
     const [rowWords, setRowWords]: [string[], any] = useState([])
     const [rowColors, setRowColors]: [number[][], any] = useState([])
     const [curRow, setCurRow]: [number, any] = useState(0)
@@ -97,6 +98,9 @@ export default function WordleBoard(props: BoardProps) {
                         else
                             setCurRow(0)
                         setResponseText("")
+                    }
+                    else if (response == "Time's up") {
+                        navigate("/gameover")
                     }
                     else
                     {

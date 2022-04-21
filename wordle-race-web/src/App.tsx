@@ -8,6 +8,7 @@ import QueuePage from "./components/QueuePage"
 import {createStore, StateMachineProvider} from "little-state-machine";
 import RegisterPage from "./components/RegisterPage"
 import Homepage from "./components/Homepage";
+import GameOverPage from "./components/GameOverPage"
 import SessionRestore from "./wrappers/SessionRestore";
 import PlayPage from "./components/PlayPage";
 
@@ -52,6 +53,11 @@ function App() {
                 <Route path={"/prequeue"} element={
                   <div>
                       <QueuePage/>
+                  </div>
+              }/>
+              <Route path={"/gameover"} element={
+                  <div>
+                      <GameOverPage/>
                   </div>
               }/>
             </Routes>

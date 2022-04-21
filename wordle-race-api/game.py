@@ -1,7 +1,7 @@
 import uuid
 import time
 from database import db
-from flask import Blueprint, request, session
+from flask import Blueprint, request, session, redirect, url_for
 import api_draft
 import json
 
@@ -13,14 +13,8 @@ user_collection = db["users"]
 @game_blueprint.route("/check", methods=['POST'])
 def check_endpoint():
     check_request = request.json
-    game_status = game_statuses[check_request['id']]
     game = getGameByUser(session['username'])
     player = game.player1 if game.player1 == session['username'] else game.player2
-
-    if game_status == "Completed":
-        return json.dumps({
-            "response": "Time's up",
-        })
 
     if time.time() - game.start_time >= game.duration:
         del_game(game)
@@ -30,6 +24,10 @@ def check_endpoint():
             None
             #change scores need to add table to db
             #user.update_one(scores, )
+    
+    game_status = game_statuses[check_request['id']]
+
+    if game_status == "Completed":
         return json.dumps({
             "response": "Time's up",
         })
@@ -98,6 +96,17 @@ def new_board():
         "response": "Success"
     })
 
+@game_blueprint.route("/gameresults", methods=['GET'])
+def game_results():
+    # TODO: gather information
+    return json.dumps({
+        "player1": "player1",
+        "player2": "player2",
+        "player1score": "player1score",
+        "player2score": "player2score",
+        "winner": "winner"
+    })
+
 def add_game(game):
     current_games.append(game)
     game_statuses[str(game.id)] = "Active"
@@ -122,7 +131,7 @@ def getGameById(id):
 
 
 class Game:
-    def __init__(self, player1, player2, size, duration=500):
+    def __init__(self, player1, player2, size, duration=10):
         self.boards = list()
         self.player1 = player1
         self.player2 = player2

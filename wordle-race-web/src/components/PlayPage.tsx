@@ -1,5 +1,5 @@
 import WordleBoard from "./WordleBoard";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useStateMachine} from "little-state-machine";
 import Timer from "./Timer";
 
@@ -9,6 +9,7 @@ type PlayPageProp = {
 export default function PlayPage(props: PlayPageProp) {
     const [curScore, setScore] = useState(0)
     const [opponentScore, setOpScore] = useState(0)
+    const [timeOut, setTimeOut] = useState(0)
     const { state } = useStateMachine()
     console.log(state?.gameDetails?.boardsize!)
     const doCheck = setInterval(() => {
@@ -17,7 +18,7 @@ export default function PlayPage(props: PlayPageProp) {
     return (
         state?.gameDetails?.opponent ?
         <div>
-            <Timer time={300}></Timer>
+            <Timer time={10}></Timer>
             <WordleBoard length={state?.gameDetails?.boardsize!} height={5}></WordleBoard>
             <label>Opponent: {state?.gameDetails?.opponent}</label>
         </div>
