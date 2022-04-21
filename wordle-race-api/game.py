@@ -93,7 +93,7 @@ def new_board():
             game.gen_new_board()
             game.player2_board += 1
         else:
-            game.player1_board += 1
+            game.player2_board += 1
     return json.dumps({
         "response": "Success"
     })
