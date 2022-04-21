@@ -18,6 +18,11 @@ export default function PlayPage(props: PlayPageProp) {
     const navigate = useNavigate()
     const { state } = useStateMachine()
     const checkGuess = () => {
+        axios.get('/opponent_score').then((r) => {
+            if (r.data.response == 'Success') {
+                setOpScore(r.data.score)
+            }
+        })
         let guess = rowWords[curRow]
         if (guess.length == state?.gameDetails?.boardsize) {
             axios.post('/check', {
