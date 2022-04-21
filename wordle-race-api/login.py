@@ -10,6 +10,7 @@ login_blueprint = Blueprint('login_blueprint', __name__)
 user_collection = db["users"]
 board_collection = db["boards"]
 tot_collection = db["scores"]
+#game_collection = db["games"]
 
 @login_blueprint.route("/login", methods = ['POST'])
 def login():

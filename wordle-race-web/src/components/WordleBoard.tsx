@@ -99,7 +99,8 @@ export default function WordleBoard(props: BoardProps) {
                             setCurRow(0)
                         setResponseText("")
                     }
-                    else if (response == "Time's up") {
+                    else if (response == "Time's up")
+                    {
                         navigate("/gameover")
                     }
                     else

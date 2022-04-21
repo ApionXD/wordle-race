@@ -18,7 +18,7 @@ export default function PlayPage(props: PlayPageProp) {
     return (
         state?.gameDetails?.opponent ?
         <div>
-            <Timer time={10}></Timer>
+            <Timer time={30}></Timer>
             <WordleBoard length={state?.gameDetails?.boardsize!} height={5}></WordleBoard>
             <label>Opponent: {state?.gameDetails?.opponent}</label>
         </div>
