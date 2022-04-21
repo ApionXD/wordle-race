@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 import {Routes} from "react-router-dom";
 import {Route} from "react-router";
-import WordleBoard from "./components/WordleBoard";
 import LoginPage from "./components/LoginPage"
 import QueuePage from "./components/QueuePage"
 import {createStore, StateMachineProvider} from "little-state-machine";
@@ -28,11 +27,6 @@ function App() {
                 <Route path={"/board"} element={
                     <div>
                         <QueuePage/>
-                    </div>
-                }> </Route>
-                <Route path={"/oldboard"} element={
-                    <div>
-                        <WordleBoard length={5} height={5} />
                     </div>
                 }> </Route>
                 <Route path={"/login"} element={

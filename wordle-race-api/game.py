@@ -1,7 +1,7 @@
 import uuid
 import time
 from database import db
-from flask import Blueprint, request, session, redirect, url_for
+from flask import Blueprint, request, session
 import api_draft
 import json
 
@@ -15,10 +15,14 @@ tot_collection = db["scores"]
 @game_blueprint.route("/check", methods=['POST'])
 def check_endpoint():
     check_request = request.json
+    game_status = game_statuses[check_request['id']]
     game = getGameByUser(session['username'])
-
     player = game.player1 if game.player1 == session['username'] else game.player2
 
+    if game_status == "Completed":
+        return json.dumps({
+            "response": "Time's up",
+        })
     if time.time() - game.start_time >= game.duration:
         del_game(game)
         #TODO send points to user
@@ -27,22 +31,18 @@ def check_endpoint():
             None
             #change scores need to add table to db
             #user.update_one(scores, )
-    
-    game_status = game_statuses[check_request['id']]
-
-    if game_status == "Completed":
+        
         return json.dumps({
             "response": "Time's up",
         })
 
     guess = request.json['guess']
     board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
-
     checkedGuess = board.verifyGuess(guess)
 
     if (checkedGuess==0):
         return json.dumps({
-            "response": "Failure",
+            "response": "Not Word",
             "colors": [0]
         })
 
@@ -96,7 +96,6 @@ def score_game(game_score, checkedGuess, row):
         pointsAdded *= 2
     for x in range(len(checkedGuess)):  # currently only gives points for greens
         if checkedGuess[x][1] == 2 and not x in game_score[1]:
-            print(checkedGuess[x])
             game_score[1].append(x)
             game_score = [pointsAdded + game_score[0], game_score[1]]
     if len(game_score[1]) - 1 == len(checkedGuess) or row == len(checkedGuess):  # resets what is already known green for new game
@@ -160,7 +159,7 @@ def getGameById(id):
 
 
 class Game:
-    def __init__(self, player1, player2, size, duration=10):
+    def __init__(self, player1, player2, size, duration=500):
         self.boards = list()
         self.player1 = player1
         self.player2 = player2
