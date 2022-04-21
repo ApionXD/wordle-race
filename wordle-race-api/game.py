@@ -174,6 +174,24 @@ def game_results():
         "winner": winner
     })
 
+@game_blueprint.route('/leaderboard', methods=['GET'])
+def leader_board():
+    top5 = tot_collection.aggregate([
+            {'$sort': {'score': -1}},
+            {'$limit': 5}
+            ])
+    top5users = list()
+    top5scores = list()
+    for _ in range(5):
+        tmp = top5.next()
+        top5users.append(tmp["username"])
+        top5scores.append(tmp["score"])
+    print(top5users, top5scores)
+    return json.dumps({
+        "top5users": top5users,
+        "top5scores": top5scores
+    })
+
 def add_game(game):
     current_games.append(game)
     game_statuses[str(game.id)] = "Active"

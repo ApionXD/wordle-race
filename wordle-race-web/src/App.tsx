@@ -8,6 +8,7 @@ import {createStore, StateMachineProvider} from "little-state-machine";
 import RegisterPage from "./components/RegisterPage"
 import Homepage from "./components/Homepage";
 import GameOverPage from "./components/GameOverPage"
+import LeaderboardPage from "./components/LeaderboardPage"
 import SessionRestore from "./wrappers/SessionRestore";
 import PlayPage from "./components/PlayPage";
 
@@ -52,6 +53,11 @@ function App() {
               <Route path={"/gameover"} element={
                   <div>
                       <GameOverPage/>
+                  </div>
+              }/>
+              <Route path={"/leaderboard"} element={
+                  <div>
+                      <LeaderboardPage/>
                   </div>
               }/>
             </Routes>
