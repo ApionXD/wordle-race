@@ -16,6 +16,7 @@ tot_collection = db["scores"]
 def check_endpoint():
     check_request = request.json
     game = getGameByUser(session['username'])
+
     player = game.player1 if game.player1 == session['username'] else game.player2
 
     if time.time() - game.start_time >= game.duration:
