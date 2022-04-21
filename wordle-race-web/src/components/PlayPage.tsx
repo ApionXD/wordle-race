@@ -25,6 +25,7 @@ export default function PlayPage(props: PlayPageProp) {
                 "guess": guess,
                 "curRow": curRow
             }).then((r) => {
+                console.log(r.data.response)
                 if (r.data.response == "Success") {
                     let newRowColors = [...rowColors]
                     newRowColors[curRow] = r.data.colors
@@ -52,7 +53,7 @@ export default function PlayPage(props: PlayPageProp) {
                 if (r.data.response == "Not Word") {
                     setErrorText(rowWords[curRow] + " is not a word")
                 }
-                if (r.data.response == "Time's Up") {
+                if (r.data.response == "Time's up") {
                     navigate("/gameover")
                 }
             })
@@ -102,7 +103,7 @@ export default function PlayPage(props: PlayPageProp) {
     return (
         state?.gameDetails?.opponent ?
         <div onKeyDown={(event) => {onPress(event)}} tabIndex={0}>
-            <Timer time={300}></Timer>
+            <Timer time={30}></Timer>
             <WordleBoard length={state?.gameDetails?.boardsize!} height={5} rowWords={rowWords} rowColors={rowColors} curRow={curRow}></WordleBoard>
             <label>{errorText}</label><br/>
             <label>Opponent: {state?.gameDetails?.opponent}</label><br/>

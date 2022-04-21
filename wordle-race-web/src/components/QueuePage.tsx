@@ -53,7 +53,7 @@ export default function QueuePage(props: QueuePageProps){
                             navigate("/play")
                         }
                     })
-                }, 10000)
+                }, 5000)
            }
         })
     }

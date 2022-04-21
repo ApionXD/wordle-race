@@ -1,9 +1,11 @@
-import uuid
-import time
-from database import db
-from flask import Blueprint, request, session
-import api_draft
 import json
+import time
+import uuid
+
+from flask import Blueprint, request, session
+
+import api_draft
+from database import db
 
 game_blueprint = Blueprint('game_blueprint', __name__)
 current_games = list()
@@ -166,7 +168,7 @@ def getGameById(id):
 
 
 class Game:
-    def __init__(self, player1, player2, size, duration=500):
+    def __init__(self, player1, player2, size, duration=30):
         self.boards = list()
         self.player1 = player1
         self.player2 = player2
@@ -179,7 +181,7 @@ class Game:
         self.player1score = 0
         self.player2score = 0
         self.gen_new_board()
-        self.guesses = []#Stores guesses for round
+        self.guesses = [] # Stores guesses for round
 
     def gen_new_board(self):
         new_board = api_draft.Board(self.size)
