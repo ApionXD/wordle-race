@@ -198,9 +198,14 @@ def getGameById(id):
 @game_blueprint.route('/opponent_score', methods=['GET'])
 def op_score():
     game = getGameByUser(session['username'])
+    score = 0
+    if game.player1 == session['username']:
+        game.player2score
+    elif game.player2 == session['username']:
+        game.player1score
     return json.dumps({
         "response": "Success",
-        "score": game.player2score if game.player1 == session['username'] else game.player1score
+        "score": score
     })
 
 class Game:
