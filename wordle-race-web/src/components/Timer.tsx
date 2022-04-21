@@ -13,7 +13,7 @@ export default function Timer(props: TimerProps) {
                 setTimeLeft(timeLeft => timeLeft - 1)
             }, 1000)
         }
-    })
+    }, [timeLeft])
     return (
         <div style={{display: "flex", justifyContent: 'center'}}>
             <h2 style={{color: "white"}}>{Math.floor(timeLeft / 60)}: {timeLeft % 60 < 10 ? "0" + timeLeft % 60 : timeLeft % 60}</h2>

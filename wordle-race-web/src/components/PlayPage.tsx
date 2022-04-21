@@ -23,11 +23,27 @@ export default function PlayPage(props: PlayPageProp) {
                 "guess": guess,
                 "curRow": curRow
             }).then((r) => {
-                console.log(r.data.response)
                 if (r.data.response == "Success") {
                     let newRowColors = [...rowColors]
                     newRowColors[curRow] = r.data.colors
-                    console.log(r.data.colors)
+                    console.log(newRowColors[curRow])
+                    setScore(r.data.score)
+                    if (newRowColors[curRow].every((i) => i==2)) {
+                        setErrorText("Loading next board...")
+                        setTimeout(() => {
+                            clearBoard()
+                            setErrorText("")
+                        }, 5000)
+                    }
+                    else if (curRow == 4) {
+                        setErrorText("Loading next board...")
+                        axios.post("/skip_board").then(r => {
+                            setTimeout(() => {
+                                clearBoard()
+                                setErrorText("")
+                            }, 5000)
+                        })
+                    }
                     setRowColors(newRowColors)
                     setCurRow(curRow => curRow + 1)
                 }
@@ -76,13 +92,20 @@ export default function PlayPage(props: PlayPageProp) {
             addLetter(event.key)
         }
     }
+    const clearBoard = () => {
+        setRowWords([])
+        setRowColors([])
+        setCurRow(0)
+    }
     return (
         state?.gameDetails?.opponent ?
         <div onKeyDown={(event) => {onPress(event)}} tabIndex={0}>
             <Timer time={300}></Timer>
             <WordleBoard length={state?.gameDetails?.boardsize!} height={5} rowWords={rowWords} rowColors={rowColors} curRow={curRow}></WordleBoard>
             <label>{errorText}</label><br/>
-            <label>Opponent: {state?.gameDetails?.opponent}</label>
+            <label>Opponent: {state?.gameDetails?.opponent}</label><br/>
+            <label>Score: {curScore}</label><br/>
+            <label>Opponent Score: {opponentScore}</label><br/>
         </div>
             :
             <div>

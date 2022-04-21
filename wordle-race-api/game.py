@@ -16,13 +16,14 @@ tot_collection = db["scores"]
 def check_endpoint():
     check_request = request.json
     game_status = game_statuses[check_request['id']]
-    game = getGameByUser(session['username'])
-    player = game.player1 if game.player1 == session['username'] else game.player2
-
     if game_status == "Completed":
         return json.dumps({
             "response": "Time's up",
         })
+    game = getGameByUser(session['username'])
+    player = game.player1 if game.player1 == session['username'] else game.player2
+
+    # Ends game if time is up
     if time.time() - game.start_time >= game.duration:
         del_game(game)
         #TODO send points to user
@@ -31,12 +32,12 @@ def check_endpoint():
             None
             #change scores need to add table to db
             #user.update_one(scores, )
-        
+
         return json.dumps({
             "response": "Time's up",
         })
 
-    guess = request.json['guess']
+    guess = check_request['guess']
     board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
     checkedGuess = board.verifyGuess(guess)
 
@@ -53,6 +54,8 @@ def check_endpoint():
         game.player1score = game_score[0]
     else:
         game.player2score = game_score[0]
+    if board.word == guess:
+        new_board(player)
 
     storeInformation(game_score, checkedGuess, session['username'], game, board)
     return json.dumps({
@@ -105,11 +108,10 @@ def score_game(game_score, checkedGuess, row):
     return game_score
 
 
-@game_blueprint.route("/newboard", methods=['POST'])
-def new_board():
-    game = getGameByUser(session['username'])
-    if (game.player1 == session['username']):
-        if (game.player1_board == len(game.boards)-1):
+def new_board(user):
+    game = getGameByUser(user)
+    if game.player1 == user:
+        if game.player1_board == len(game.boards)-1:
             game.gen_new_board()
             game.player1_board += 1
         else:
@@ -120,6 +122,11 @@ def new_board():
             game.player2_board += 1
         else:
             game.player2_board += 1
+
+# This gets called when the user has run out of guesses
+@game_blueprint.route("/skip_board", methods=['POST'])
+def skip_board():
+    new_board(session['username'])
     return json.dumps({
         "response": "Success"
     })
