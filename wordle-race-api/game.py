@@ -13,6 +13,7 @@ game_statuses = dict()
 user_collection = db["users"]
 board_collection = db["boards"]
 tot_collection = db["scores"]
+game_collection = db["games"]
 
 @game_blueprint.route("/check", methods=['POST'])
 def check_endpoint():
@@ -27,20 +28,21 @@ def check_endpoint():
 
     # Ends game if time is up
     if time.time() - game.start_time >= game.duration:
+        storeGameinDatabase(game)
+        game_statuses[check_request['id']] = "Completed"
         del_game(game)
-        #TODO send points to user
-        user = user_collection.find_one({"username": player})
-        if user is not None:
-            None
-            #change scores need to add table to db
-            #user.update_one(scores, )
-
         return json.dumps({
             "response": "Time's up",
         })
+            #change scores need to add table to db
+            #user.update_one(scores, )
 
-    guess = check_request['guess']
+
+
+
+    guess = request.json['guess']
     board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
+
     checkedGuess = board.verifyGuess(guess)
 
     if (checkedGuess==0):
@@ -66,6 +68,20 @@ def check_endpoint():
         "score": game_score[0]
     })
 
+def storeGameinDatabase(game):
+    user_obj = {
+        #"username": player,
+        "id": str(game.id),
+        "player1":game.player1,
+        "player2":game.player2,
+        "player1score": game.player1score,
+        "player2score": game.player2score,
+        "boardp1": game.p1guesses,
+        "boardp2": game.p2guesses
+    }
+    game_collection.insert_one(user_obj)
+
+#needs to be adjusted to work with other things
 def storeInformation(score, checkedGuess, username, game, board):
     words = ""
     count = 0
@@ -73,11 +89,14 @@ def storeInformation(score, checkedGuess, username, game, board):
         words += i[0]+str(i[1])
         if i[1]==2:
             count += 1
-    game.guesses.append(words)
-    if count>=len(checkedGuess) or len(game.guesses)==len(checkedGuess):
-        game.guesses.append(board.get_word())
-        board_collection.find_one_and_update({'username': username},{'$push': {'boards':game.guesses}})
-        board_collection.find_one_and_update({'username': username}, {'$push': {'score': str(score[0])}})
+    player = game.p1guesses
+    if game.player2 == username:
+        player = game.p2guesses
+    player.append(words)
+    if count>=len(checkedGuess) or len(player)==len(checkedGuess):
+        player.append(board.get_word())
+        board_collection.find_one_and_update({'username': username},{'$push': {'boards':player}})
+        board_collection.find_one_and_update({'username': username}, {'$push': {'score': [str(score[0])]}})
         user = tot_collection.find_one({
             "username": username
         })
@@ -133,15 +152,26 @@ def skip_board():
         "response": "Success"
     })
 
-@game_blueprint.route("/gameresults", methods=['GET'])
+@game_blueprint.route("/gameresults", methods=['POST'])
 def game_results():
     # TODO: gather information
+    check_request = request.json
+    game = game_collection.find_one({"id": str(check_request["id"])})
+    player = game["player1"]
+    player2 = game["player2"]
+    winner = "Tie"
+    player1score = game["player1score"]
+    player2score = game["player2score"]
+    if (player1score>player2score):
+        winner = player
+    if (player2score>player1score):
+        winner = player2
     return json.dumps({
-        "player1": "player1",
-        "player2": "player2",
-        "player1score": "player1score",
-        "player2score": "player2score",
-        "winner": "winner"
+        "player1": player,
+        "player2": player2,
+        "player1score": player1score,
+        "player2score": player2score,
+        "winner": winner
     })
 
 def add_game(game):
@@ -187,8 +217,8 @@ class Game:
         self.player1score = 0
         self.player2score = 0
         self.gen_new_board()
-        self.guesses = [] # Stores guesses for round
-
+        self.p1guesses = []#Stores guesses for round
+        self.p2guesses = []
     def gen_new_board(self):
         new_board = api_draft.Board(self.size)
         self.boards.append(new_board)
