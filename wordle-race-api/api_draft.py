@@ -69,4 +69,6 @@ class Board:
     def validate(s):
         return s.isalpha()
 
+    def get_word(self):
+        return self.word
 

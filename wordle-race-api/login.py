@@ -8,7 +8,8 @@ from hashlib import sha256
 
 login_blueprint = Blueprint('login_blueprint', __name__)
 user_collection = db["users"]
-
+board_collection = db["boards"]
+tot_collection = db["scores"]
 
 @login_blueprint.route("/login", methods = ['POST'])
 def login():
@@ -30,6 +31,28 @@ def login():
     session["signed_in"] = True
     session["username"] = user_details["username"]
     session["boardsize"] = 5
+
+    #See if user is in board
+    user = board_collection.find_one({
+        "username": user_details["username"]
+    })
+    if user is None:
+        board_obj = {
+            "username": user_details["username"],
+            "boards": [],
+            "score": []
+        }
+        board_collection.insert_one(board_obj)
+
+    user = tot_collection.find_one({
+        "username": user_details["username"]
+    })
+    if user is None:
+        tot_obj = {
+            "username": user_details["username"],
+            "score": 0
+        }
+        tot_collection.insert_one(tot_obj)
     return json.dumps({
         "response": "Success",
         "user": user_details["username"],
