@@ -2,13 +2,13 @@ import React from 'react';
 import './App.css';
 import {Routes} from "react-router-dom";
 import {Route} from "react-router";
-import WordleBoard from "./components/WordleBoard";
 import LoginPage from "./components/LoginPage"
 import QueuePage from "./components/QueuePage"
 import {createStore, StateMachineProvider} from "little-state-machine";
 import RegisterPage from "./components/RegisterPage"
 import Homepage from "./components/Homepage";
 import GameOverPage from "./components/GameOverPage"
+import LeaderboardPage from "./components/LeaderboardPage"
 import SessionRestore from "./wrappers/SessionRestore";
 import PlayPage from "./components/PlayPage";
 
@@ -28,11 +28,6 @@ function App() {
                 <Route path={"/board"} element={
                     <div>
                         <QueuePage/>
-                    </div>
-                }> </Route>
-                <Route path={"/oldboard"} element={
-                    <div>
-                        <WordleBoard length={5} height={5} />
                     </div>
                 }> </Route>
                 <Route path={"/login"} element={
@@ -58,6 +53,11 @@ function App() {
               <Route path={"/gameover"} element={
                   <div>
                       <GameOverPage/>
+                  </div>
+              }/>
+              <Route path={"/leaderboard"} element={
+                  <div>
+                      <LeaderboardPage/>
                   </div>
               }/>
             </Routes>

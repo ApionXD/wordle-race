@@ -1,9 +1,8 @@
 import collections
-from wonderwords import RandomWord
-from flask import Blueprint
-import json
-import enchant
 
+import enchant
+from flask import Blueprint
+from wonderwords import RandomWord
 
 api_blueprint = Blueprint('api_blueprint', __name__)
 
@@ -12,7 +11,7 @@ class Board:
     dictionary = None
     def __init__(self, size):
         self.size = size
-        self.word = Board.generateword(length=size)
+        self.word = Board.generateword(length=size).upper()
         global dictionary
         dictionary = enchant.Dict("en_US")
         print(self.word)
@@ -30,7 +29,6 @@ class Board:
         if not Board.validate(guess):
             print('ERROR: INVALID GUESS')
             return 0
-        guess = guess.lower()
         returnArray = [tuple(('', 0)) for x in range(len(guess))]
 
         global dictionary

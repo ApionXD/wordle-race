@@ -26,7 +26,8 @@ export default function Homepage(props: HomepageProps) {
                     :
                       <>
                       <label>Hello { state.username}<br/></label>
-                      <Link to={"/prequeue"}>Play</Link>
+                      <Link to={"/prequeue"}>Play</Link><br/>
+                      <Link to={"/leaderboard"}>Leaderboard</Link><br/>
                       <button style={{backgroundColor: "green"}} onClick={() => {
                           actions.logOut(undefined)
                           axios.get("/logout")
