@@ -8,7 +8,6 @@ from hashlib import sha256
 
 login_blueprint = Blueprint('login_blueprint', __name__)
 user_collection = db["users"]
-board_collection = db["boards"]
 tot_collection = db["scores"]
 #game_collection = db["games"]
 
@@ -33,25 +32,14 @@ def login():
     session["username"] = user_details["username"]
     session["boardsize"] = 5
 
-    #See if user is in board
-    user = board_collection.find_one({
-        "username": user_details["username"]
-    })
-    if user is None:
-        board_obj = {
-            "username": user_details["username"],
-            "boards": [],
-            "score": []
-        }
-        board_collection.insert_one(board_obj)
-
     user = tot_collection.find_one({
         "username": user_details["username"]
     })
     if user is None:
         tot_obj = {
             "username": user_details["username"],
-            "score": 0
+            "score": 0,
+            "role": 0 #role=0 noob 1 veteran
         }
         tot_collection.insert_one(tot_obj)
     return json.dumps({

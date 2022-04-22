@@ -11,10 +11,9 @@ game_blueprint = Blueprint('game_blueprint', __name__)
 current_games = list()
 game_statuses = dict()
 user_collection = db["users"]
-board_collection = db["boards"]
 tot_collection = db["scores"]
 game_collection = db["games"]
-
+board_height = 5 #since board height is always 5 change if that ever changes
 @game_blueprint.route("/check", methods=['POST'])
 def check_endpoint():
     check_request = request.json
@@ -25,10 +24,11 @@ def check_endpoint():
         })
     game = getGameByUser(session['username'])
     player = game.player1 if game.player1 == session['username'] else game.player2
-
+    guess = request.json['guess']
+    board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
     # Ends game if time is up
     if time.time() - game.start_time >= game.duration:
-        storeGameinDatabase(game)
+        storeGameinDatabase(game, board)
         game_statuses[check_request['id']] = "Completed"
         del_game(game)
         return json.dumps({
@@ -36,12 +36,6 @@ def check_endpoint():
         })
             #change scores need to add table to db
             #user.update_one(scores, )
-
-
-
-
-    guess = request.json['guess']
-    board = game.boards[game.player1_board] if game.player1 == session['username'] else game.boards[game.player2_board]
 
     checkedGuess = board.verifyGuess(guess)
 
@@ -61,14 +55,16 @@ def check_endpoint():
     if board.word == guess:
         new_board(player)
 
-    storeInformation(game_score, checkedGuess, session['username'], game, board)
+    storeInfo(checkedGuess, session['username'], game, board)
     return json.dumps({
         "response": "Success",
         "colors": [x[1] for x in checkedGuess],
         "score": game_score[0]
     })
 
-def storeGameinDatabase(game):
+def storeGameinDatabase(game, board):
+    game.p1guesses[-1].append(board.get_word())
+    game.p2guesses[-1].append(board.get_word())
     user_obj = {
         #"username": player,
         "id": str(game.id),
@@ -81,31 +77,37 @@ def storeGameinDatabase(game):
     }
     game_collection.insert_one(user_obj)
 
-#needs to be adjusted to work with other things
-def storeInformation(score, checkedGuess, username, game, board):
-    words = ""
-    count = 0
-    for i in checkedGuess:
-        words += i[0]+str(i[1])
-        if i[1]==2:
-            count += 1
+    updateScoreandRole(game.player1, game.player1score) #adjusts score/role
+    updateScoreandRole(game.player2, game.player2score)
+
+
+
+def updateScoreandRole(player, score):
+    user = tot_collection.find_one({
+        "username": player
+    })
+    overallScore = user['score']
+    overallScore += score
+    role = int(user['role'])
+    if (overallScore > 1000 and role < 1):  # changes role if you have over a thousand points to 1
+        print("changed role: ", player)
+        tot_collection.find_one_and_update({'username': player}, {'$set': {'role': 1}})
+
+    tot_collection.find_one_and_update({'username': player}, {'$set': {'score': overallScore}})
+
+def storeInfo(checkedGuess, username, game, board):
     player = game.p1guesses
     if game.player2 == username:
         player = game.p2guesses
-    player.append(words)
-    if count>=len(checkedGuess) or len(player)==len(checkedGuess):
-        player.append(board.get_word())
-        board_collection.find_one_and_update({'username': username},{'$push': {'boards':player}})
-        board_collection.find_one_and_update({'username': username}, {'$push': {'score': [str(score[0])]}})
-        user = tot_collection.find_one({
-            "username": username
-        })
-        overallScore = user['score']
-        overallScore += score[0]
-        tot_collection.find_one_and_update({'username': username}, {'$set': {'score': overallScore}})
-        game.guesses = []
-
-
+    player[-1].append(checkedGuess)
+    print(player)
+    count = 0
+    for i in checkedGuess:
+        if i[1]==2:
+            count += 1
+    if count>=len(checkedGuess) or len(player[-1])>=board_height: #sees if correct word needs to be added to board/makes new board
+        player[-1].append(board.get_word())
+        player.append([])
 
 
 def score_game(game_score, checkedGuess, row):
@@ -159,18 +161,22 @@ def game_results():
     game = game_collection.find_one({"id": str(check_request["id"])})
     player = game["player1"]
     player2 = game["player2"]
-    winner = "Tie"
+    player1board = game["boardp1"]
+    player2board = game["boardp2"]
+    winner = "It's a tie!"
     player1score = game["player1score"]
     player2score = game["player2score"]
     if (player1score>player2score):
-        winner = player
+        winner = player+" wins!"
     if (player2score>player1score):
-        winner = player2
+        winner = player2+" wins!"
     return json.dumps({
         "player1": player,
         "player2": player2,
         "player1score": player1score,
         "player2score": player2score,
+        "player1board": player1board,
+        "player2board": player2board,
         "winner": winner
     })
 
@@ -217,17 +223,17 @@ def getGameById(id):
 def op_score():
     game = getGameByUser(session['username'])
     score = 0
-    if game.player1 == session['username']:
-        game.player2score
-    elif game.player2 == session['username']:
-        game.player1score
+    if game is not None and game.player1 == session['username']:
+        score = game.player2score
+    elif game is not None and game.player2 == session['username']:
+        score = game.player1score
     return json.dumps({
         "response": "Success",
         "score": score
     })
 
 class Game:
-    def __init__(self, player1, player2, size, duration=30):
+    def __init__(self, player1, player2, size, duration=300):
         self.boards = list()
         self.player1 = player1
         self.player2 = player2
@@ -240,8 +246,8 @@ class Game:
         self.player1score = 0
         self.player2score = 0
         self.gen_new_board()
-        self.p1guesses = []#Stores guesses for round
-        self.p2guesses = []
+        self.p1guesses = [[]]#Stores guesses for round
+        self.p2guesses = [[]]
     def gen_new_board(self):
         new_board = api_draft.Board(self.size)
         self.boards.append(new_board)

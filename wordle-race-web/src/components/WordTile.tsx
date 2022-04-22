@@ -20,6 +20,9 @@ export default function WordTile(props: TileProps) {
             case (2):
                 colorCode = "#538D4E"
                 break
+            case (3):
+                colorCode = "#420505"
+                break
         }
     return (
             <Stage width={48} height={48}>

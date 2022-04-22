@@ -108,7 +108,7 @@ export default function PlayPage(props: PlayPageProp) {
     return (
         state?.gameDetails?.opponent ?
         <div onKeyDown={(event) => {onPress(event)}} tabIndex={0}>
-            <Timer time={30}></Timer>
+            <Timer time={300}></Timer>
             <WordleBoard length={state?.gameDetails?.boardsize!} height={5} rowWords={rowWords} rowColors={rowColors} curRow={curRow}></WordleBoard>
             <label>{errorText}</label><br/>
             <label>Opponent: {state?.gameDetails?.opponent}</label><br/>

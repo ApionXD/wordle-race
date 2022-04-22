@@ -3,12 +3,13 @@ import json
 from flask import Blueprint, request, session
 
 from game import getGameByUser, Game, add_game
+from database import db
 
 matchmaking_blueprint = Blueprint('matchmaking_blueprint', __name__)
 # This is the list of people in the matchmaking queue
 matchmaking_queue = list()
 matchmaker_pipe = None
-
+tot_collection = db["scores"]
 
 # For testing only.
 '''
@@ -29,6 +30,9 @@ def run_matchmaking(pipe):
     matchmaking_queue[4] = list()
     matchmaking_queue[5] = list()
     matchmaking_queue[6] = list()
+    matchmaking_queue[7] = list()
+    matchmaking_queue[8] = list()
+    matchmaking_queue[9] = list()
     while True:
         if pipe.poll():
             queue_request = pipe.recv()
@@ -54,6 +58,15 @@ def run_matchmaking(pipe):
 def queue_endpoint():
     username = session['username']
     board_size = request.json['boardSize']
+
+    user = tot_collection.find_one({
+        "username": username
+    })
+    if int(user['role'])<1 and board_size>6:
+        return json.dumps({
+            "response": "Role too low",
+        })
+
     matchmaker_pipe.send((username, board_size))
     return json.dumps({
         "response": "Success",
