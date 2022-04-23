@@ -10,18 +10,18 @@ Wordle race is a competitive version of the beloved wordle. Instead of having th
 -A game over page that shows the scores of the two players and who won, while also showing all the boards the players played in their last match.<br>
 
 ## Instructions:
-###Back-end <br>
+### Back-end <br>
 You must ‘pip install -r requirements.txt’ in ‘/wordle-race-api/’ to install the dependencies for the back-end. Then run ```py main.py``` to start the back-end.
 ### Front-end <br>
 You will need npm to install the requirements for the front-end. First you must go to ‘./wordle-race-web/’ folder and run ```npm install``` to install all required dependencies. After, to run the front-end you must run ```npm start``` which will launch the dev environment of the frontend, bound to 127.0.0.1:3000
 
-## Dependencies:
-###Back-End:
+### Dependencies:
+### Back-End:
 Flask \
 pymongo \
 Wonderwords \
 pyenchant <br>
-###Front-end:
+### Front-end:
 Axios\
 Little-state-machine \
 React \
@@ -33,7 +33,8 @@ The followings provides a general structure but almost every aspect of the progr
 ### Kunle: Dealt with most things database and login related.
 ### Tristan: Worked on word checking logic, game over page, leader board page, and the different size board lengths. 
 ### Notes:
-This project may seem fairly basic on the surface, but the implementation of the features was more complicated 
-
+-This project may seem fairly basic on the surface, but the implementation is more complicated.\
+-Made the gameover screen show the boards played through the latest game session.\
+-All aspects of the project propasal were met.
 
 
